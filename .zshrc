@@ -29,3 +29,15 @@ source $ZSH/oh-my-zsh.sh
 # aliases
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
 
+alias ga="git add"
+alias gc="git commit"
+alias gcm="git commit -m"
+alias gpl="git pull"
+alias gp="git push"
+alias gr="git rebase"
+alias gt="git tree"
+alias gadog="git adog"
+alias gl="git log"
+
+alias configure="nvim ~/.zshrc"
+alias shortcuts="nvim ~/.config/skhd/skhdrc"

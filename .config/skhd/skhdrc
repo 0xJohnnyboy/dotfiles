@@ -1,0 +1,21 @@
+# Focus spaces 
+ctrl - left : yabai -m space --focus prev
+ctrl - right : yabai -m space --focus next
+
+# Focus display
+hyper - h: yabai -m display --focus 2
+hyper - l: yabai -m display --focus 1
+
+# Resize window
+meh - q: yabai -m window --resize left:20:0 || yabai -m window --resize right:20:0
+meh - w: yabai -m window --resize left:-20:0 || yabai -m window --resize right:-20:0
+
+# Focus window
+alt - h : yabai -m window --focus west
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north 
+alt - l : yabai -m window --focus east
+
+alt - r : yabai -m space --rotate 90
+
+alt - f : yabai -m window --toggle zoom-fullscreen

@@ -25,3 +25,7 @@ export PATH="$BUN_INSTALL/bin:$PATH:/Users/johnnyboy/.local/share/solana/install
 plugins=(git)
 
 source $ZSH/oh-my-zsh.sh
+
+# aliases
+alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
+

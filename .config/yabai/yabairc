@@ -9,7 +9,7 @@ yabai -m config layout bsp
 # yabai -m config normal_window_opacity 0.9
 
 # Spacing around windows
-yabai -m config top_padding 60
+yabai -m config top_padding 20
 yabai -m config bottom_padding 20
 yabai -m config left_padding 20
 yabai -m config right_padding 20

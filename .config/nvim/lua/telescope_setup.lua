@@ -1,5 +1,6 @@
 local ok_m, m = pcall(require, "mapx")
 local ok_telescope, telescope = pcall(require, "telescope")
+local vim = vim
 
 local ready = ok_m and ok_telescope
 
@@ -56,9 +57,3 @@ telescope.load_extension("fzf")
 telescope.load_extension("project")
 telescope.load_extension("neoclip")
 
-m.noremap("<leader>fd", ":Telescope file_browser<CR>")
-m.noremap("<leader>fb", ":Telescope file_browser path=%:p:h<CR>", "silent")
-m.noremap("<leader>ff", ":Telescope find_files<CR>", "silent")
-m.noremap("<leader>fg", ":Telescope live_grep<CR>", "silent")
-m.noremap("<leader>pp", ":Telescope project<CR>", "silent")
-m.noremap("<leader>nc", ":Telescope neoclip<CR>", "silent")

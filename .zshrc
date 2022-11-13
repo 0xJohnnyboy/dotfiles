@@ -42,3 +42,19 @@ alias gl="git log"
 
 alias configure="nvim ~/.zshrc"
 alias shortcuts="nvim ~/.config/skhd/skhdrc"
+
+# functions
+function paste() {
+    local file=${1:-/dev/stdin}
+    curl --data-binary @${file} https://paste.rs
+}
+
+function dpaste() {
+    local id=${1:-/dev/stdin}
+    curl -X DELETE https://paste.rs/${id}
+}
+
+function gpaste() {
+    local id=${1:-/dev/stdin}
+    curl https://paste.rs/${id}
+}

@@ -25,8 +25,7 @@ fi
 
 sketchybar --set ${NAME}\
                  icon=$ICON\
-                 icon.color=$MAIN_COLOR\
+                 icon.color=$LIGHT_COLOR\
                  label="${BATT_PERCENT}%"\
-                 label.color=$MAIN_COLOR\
+                 label.color=$LIGHT_COLOR\
                  background.drawing=on\
-                 background.color=$ACCENT_COLOR\

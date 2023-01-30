@@ -45,9 +45,22 @@ alias drdi="docker rmi $(docker images -f "dangling=true" -q)"
 alias dsa="docker stop $(docker ps -q)"
 
 alias configure="nvim ~/.zshrc"
+alias refresh="source ~/.zshrc"
 alias shortcuts="nvim ~/.config/skhd/skhdrc"
 
 # functions
+
+## docker
+function dx() {
+    docker exec -it "$1" "$2"
+}
+
+function dsh() {
+    docker exec -it "$1" sh
+}
+## docker end
+
+## utility
 function paste() {
     local file=${1:-/dev/stdin}
     curl --data-binary @${file} https://paste.rs
@@ -62,3 +75,4 @@ function gpaste() {
     local id=${1:-/dev/stdin}
     curl https://paste.rs/${id}
 }
+## utility end

@@ -195,10 +195,14 @@ terminal:
 ssh: {}
 configSync:
   parts: {}
+  token: >-
+    1a585e84918254339d7dcadc4d7d02aa8ab7f5431124e4cefb8e3022b208ffdbbe1b62a65a56266a3e1bf1f852abba8a1eed38d66130345de309e2eaa030de94
+  configID: 20149
 clickableLinks: {}
 accessibility: {}
 appearance:
-  opacity: 0.73
+  tabsLocation: bottom
+  opacity: 0.9
 hacks: {}
 language: en-US
 enableAnalytics: false

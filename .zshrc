@@ -1,3 +1,9 @@
+# oh my zsh
+export ZSH="$HOME/.oh-my-zsh"
+plugins=(git)
+
+source $ZSH/oh-my-zsh.sh
+
 # Homebrew
 export PATH="/opt/homebrew/bin:$PATH"
 
@@ -59,16 +65,35 @@ function dsh() {
 ## docker end
 
 ## utility
+
+## make dir and jump into it
+function mkcd() {
+    mkdir -p ${1}
+    cd ${1}
+    echo "created and jumped into ${1}"
+}
+
+## remove current dir
+function rmc() {
+    local cwd=$(pwd)
+    cd ../
+    rm -rf ${cwd}
+    echo "${cwd} deleted"
+}
+
+## paste rs
 function paste() {
     local file=${1:-/dev/stdin}
     curl --data-binary @${file} https://paste.rs
 }
 
+## delete paste rs
 function dpaste() {
     local id=${1:-/dev/stdin}
     curl -X DELETE https://paste.rs/${id}
 }
 
+## get paste rs
 function gpaste() {
     local id=${1:-/dev/stdin}
     curl https://paste.rs/${id}

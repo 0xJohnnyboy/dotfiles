@@ -20,8 +20,12 @@ export BUN_INSTALL="/Users/johnnyboy/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH:/Users/johnnyboy/.local/share/solana/install/active_release/bin:$PATH:/Users/johnnyboy/Library/Python/3.8/bin:$PATH"
 
 # aliases
-alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
+alias ll="ls -alh"
+alias configure="nvim ~/.zshrc"
+alias refresh="source ~/.zshrc"
+alias shortcuts="nvim ~/.config/skhd/skhdrc"
 
+# git aliases
 alias ga="git add"
 alias gs="git status"
 alias gc="git commit"
@@ -34,13 +38,13 @@ alias gtr="git tree"
 alias gadog="git adog"
 alias gl="git log"
 
+alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
+
+# docker aliases
 alias dls="docker container ls"
 alias drdi="docker rmi $(docker images -f "dangling=true" -q)"
 alias dsa="docker stop $(docker ps -q)"
 
-alias configure="nvim ~/.zshrc"
-alias refresh="source ~/.zshrc"
-alias shortcuts="nvim ~/.config/skhd/skhdrc"
 
 # functions
 

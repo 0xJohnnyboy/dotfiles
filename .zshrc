@@ -27,6 +27,7 @@ export PATH="$BUN_INSTALL/bin:$PATH:/Users/johnnyboy/.local/share/solana/install
 
 # aliases
 alias ll="ls -alh"
+alias nv="nvim ."
 alias configure="nvim ~/.zshrc"
 alias refresh="source ~/.zshrc"
 alias shortcuts="nvim ~/.config/skhd/skhdrc"

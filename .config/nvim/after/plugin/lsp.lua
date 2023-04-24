@@ -12,6 +12,8 @@ lsp.ensure_installed({
 
 lsp.on_attach(function(client, bufnr)
     lsp.default_keymaps({ buffer = bufnr })
+
+    vim.keymap.set("n", "<leader>ca", function () vim.lsp.buf.code_action() end)
 end)
 
 -- (Optional) Configure lua language server for neovim
@@ -31,7 +33,7 @@ cmp.setup({
                 fallback()
             end
         end, { "i", "s", "c", }),
-        ['<Tab>'] = cmp.mapping(function()
+        ['<S-Tab>'] = cmp.mapping(function()
             if cmp.visible() then
                 cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
             end

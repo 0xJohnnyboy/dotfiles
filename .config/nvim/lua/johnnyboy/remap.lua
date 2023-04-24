@@ -16,7 +16,9 @@ km.set("n", "<leader>bl", ":ls<CR>")
 
 -- window splits
 km.set("n", "<leader>ws", "<C-w>s")
+km.set("n", "<leader>wsj", "<C-w>s<C-w>j")
 km.set("n", "<leader>wv", "<C-w>v")
+km.set("n", "<leader>wvl", "<C-w>v<C-w>l")
 km.set("n", "<leader>ww", "<C-w>n")
 
 km.set("n", "<leader>wc", "<C-w>q")

@@ -29,4 +29,6 @@ wk.register({
     ["<leader>wl"] = { name = "Focus right" },
     -- LSP
     ["<leader>ca"] = { name = "LSP Code action" },
+    ["[d"] = { name = "Go to next diagnostic" },
+    ["]d"] = { name = "Go to prev diagnostic" },
 })

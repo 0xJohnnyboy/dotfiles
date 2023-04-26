@@ -6,16 +6,12 @@ return require('packer').startup(function(use)
     use 'wbthomason/packer.nvim'
 
     use {
-        'nvim-telescope/telescope.nvim', tag = '0.1.1',
-        requires = { { 'nvim-lua/plenary.nvim' } }
-    }
-    use {
-        "nvim-telescope/telescope-file-browser.nvim",
-        requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
-    }
-    use {
-        "nvim-telescope/telescope-live-grep-args.nvim",
-        requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+        'nvim-telescope/telescope.nvim',
+        requires = {
+            { 'nvim-lua/plenary.nvim' },
+            { "nvim-telescope/telescope-live-grep-args.nvim" },
+            { "nvim-telescope/telescope-file-browser.nvim" },
+        },
     }
 
     use { "ellisonleao/gruvbox.nvim" }

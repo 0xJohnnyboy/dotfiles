@@ -40,7 +40,7 @@ local leader_normal_mappings = {
         v = "Default explorer",
         t = "Telescope explorer",
         f = "Search project files (git)",
-        s = "Grep string",
+        s = "Live grep",
     },
     f = {
         name = "Find",
@@ -66,7 +66,8 @@ local leader_visual_mappings = {
         name = "Comment",
         l = "Toggle line comment",
         b = "Toggle block comment",
-    }
+    },
+    ["pv"] = "Live grep visual selection",
 }
 
 -- NORMAL MODE

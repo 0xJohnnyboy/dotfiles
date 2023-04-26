@@ -67,7 +67,7 @@ local leader_visual_mappings = {
         l = "Toggle line comment",
         b = "Toggle block comment",
     },
-    ["pv"] = "Live grep visual selection",
+    ["pV"] = "Live grep visual selection",
 }
 
 -- NORMAL MODE

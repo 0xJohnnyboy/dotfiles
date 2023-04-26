@@ -13,17 +13,20 @@ return require('packer').startup(function(use)
             { "nvim-telescope/telescope-file-browser.nvim" },
         },
     }
+    use {
+        "startup-nvim/startup.nvim",
+        requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
+    }
 
-    use { "ellisonleao/gruvbox.nvim" }
+    use "m4xshen/smartcolumn.nvim"
+    use 'ellisonleao/gruvbox.nvim'
     use("nvim-treesitter/nvim-treesitter", { run = ':TSUpdate' })
     use 'mbbill/undotree'
     use 'tpope/vim-fugitive'
     use 'tpope/vim-surround'
+    use 'tpope/vim-eunuch'
     use {
         'numToStr/Comment.nvim',
-        config = function()
-            require('Comment').setup()
-        end
     }
     use {
         'VonHeikemen/lsp-zero.nvim',
@@ -52,11 +55,6 @@ return require('packer').startup(function(use)
         config = function()
             vim.o.timeout = true
             vim.o.timeoutlen = 300
-            require("which-key").setup {
-                -- your configuration comes here
-                -- or leave it empty to use the default settings
-                -- refer to the configuration section below
-            }
         end
     }
 

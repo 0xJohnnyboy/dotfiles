@@ -4,6 +4,7 @@ wk.register({
     -- search, explore
     ["<leader><Esc><Esc>"] = { name = "Remove highlighting after search" },
     ["<leader>pv"] = { name = "Explorer" },
+    ["<leader>fb"] = { name = "Telescope Explorer" },
     ["<leader>ff"] = { name = "Fuzzy find files" },
     ["<leader>pf"] = { name = "Search project (git) files" },
     ["<leader>ps"] = { name = "Grep string" },

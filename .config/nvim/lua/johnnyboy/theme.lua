@@ -20,14 +20,17 @@ function getWindowsInterfaceStyle()
     local value = winapi.registry.read_string(registryKey, valueName)
 
     if value ~= nil and tonumber(value) == 0 then
-        return "Dark"
+        return "dark"
     else
-        return "Light"
+        return "light"
     end
 end
 
 -- get theme depending on os
 function getTheme()
+    if vim.fn.has("wsl") then
+        return "dark"
+    end
     if (vim.fn.has("macunix")) then
         return getAppleInterfaceStyle()
     else

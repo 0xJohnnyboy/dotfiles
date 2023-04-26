@@ -13,13 +13,22 @@ return require('packer').startup(function(use)
         "nvim-telescope/telescope-file-browser.nvim",
         requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
     }
+    use {
+        "nvim-telescope/telescope-live-grep-args.nvim",
+        requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+    }
 
     use { "ellisonleao/gruvbox.nvim" }
     use("nvim-treesitter/nvim-treesitter", { run = ':TSUpdate' })
     use 'mbbill/undotree'
     use 'tpope/vim-fugitive'
     use 'tpope/vim-surround'
-
+    use {
+        'numToStr/Comment.nvim',
+        config = function()
+            require('Comment').setup()
+        end
+    }
     use {
         'VonHeikemen/lsp-zero.nvim',
         branch = 'v2.x',

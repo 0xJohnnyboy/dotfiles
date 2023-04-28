@@ -18,6 +18,15 @@ return require('packer').startup(function(use)
         requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
     }
 
+    use {
+        "folke/trouble.nvim",
+        requires = "nvim-tree/nvim-web-devicons",
+        config = function()
+            require("trouble").setup {
+            }
+        end
+    }
+
     use "m4xshen/smartcolumn.nvim"
     use 'ellisonleao/gruvbox.nvim'
     use("nvim-treesitter/nvim-treesitter", { run = ':TSUpdate' })

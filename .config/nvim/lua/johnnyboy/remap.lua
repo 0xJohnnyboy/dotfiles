@@ -1,6 +1,9 @@
 vim.g.mapleader = " "
 local km = vim.keymap
 
+-- edition
+km.set("i", "<C-b>", "<C-BS><C-W")
+
 -- search
 km.set("n", "<leader><Esc><Esc>", ":noh<CR>")
 

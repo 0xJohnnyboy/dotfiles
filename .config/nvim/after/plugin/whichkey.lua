@@ -80,7 +80,16 @@ local normal_mappings = {
     ["]d"] = "Go to previous diagnostic",
 }
 
+-- INSERT MODE
+local insert_opts = {
+    mode = "i",
+    silent = true
+}
+local insert_mappings = {
+    ["<C-b>"] = "Delete previous word",
+}
 -- REGISTER
 wk.register(leader_normal_mappings, leader_normal_opts)
 wk.register(leader_visual_mappings, leader_visual_opts)
 wk.register(normal_mappings, normal_opts)
+wk.register(insert_mappings, insert_opts)

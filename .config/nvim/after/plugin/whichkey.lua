@@ -19,6 +19,24 @@ local leader_normal_mappings = {
         k = "Focus up",
         l = "Focus right",
     },
+    s = {
+        name = "Scretch.nvim",
+        n = "New scretch",
+        ["nn"] = "New named scretch",
+        l = "Toggle last scretch",
+        s = "Search scretches",
+        g = "Live grep scretches",
+        v = "Explore scretches",
+    },
+    x = {
+        name = "Trouble",
+        x = "Toggle Trouble",
+        w = "Trouble workspace diagnostics",
+        d = "Trouble document diagnostics",
+        l = "Trouble loclist",
+        q = "Trouble quickfix",
+        R = "Trouble LSP references"
+    },
     b = {
         name = "buffer",
         n = "Next buffer",

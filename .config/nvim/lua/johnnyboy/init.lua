@@ -8,3 +8,4 @@ vim.opt.tabstop=4
 vim.opt.expandtab=true
 -- todo : find a way to have indents fold markers but closed by default
 -- vim.opt.foldmethod="indent"
+

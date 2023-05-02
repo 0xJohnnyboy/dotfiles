@@ -13,6 +13,11 @@ return require('packer').startup(function(use)
             { "nvim-telescope/telescope-file-browser.nvim" },
         },
     }
+    -- use '~/projects/scretch'
+    use {
+        "Sonicfury/scretch.nvim",
+        requires = 'nvim-telescope/telescope.nvim',
+    }
     use {
         "startup-nvim/startup.nvim",
         requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
@@ -21,10 +26,6 @@ return require('packer').startup(function(use)
     use {
         "folke/trouble.nvim",
         requires = "nvim-tree/nvim-web-devicons",
-        config = function()
-            require("trouble").setup {
-            }
-        end
     }
 
     use "m4xshen/smartcolumn.nvim"

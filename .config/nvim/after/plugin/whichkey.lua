@@ -44,6 +44,7 @@ local leader_normal_mappings = {
         d = "Close buffer",
         l = "List buffers",
         r = "Refresh buffers (redraw)",
+        x = "Close all but the current one",
     },
     c = {
         name = "Comment",

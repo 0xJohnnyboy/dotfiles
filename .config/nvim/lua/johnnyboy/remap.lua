@@ -15,6 +15,7 @@ km.set("n", "<leader>bn", ":bnext<CR>")
 km.set("n", "<leader>bp", ":bprevious<CR>")
 km.set("n", "<leader>bd", ":bd!<CR>")
 km.set("n", "<leader>br", ":redraw<CR>")
+km.set("n", "<leader>bx", ":%bd|e#<CR>")
 
 -- window splits
 km.set("n", "<leader>ws", "<C-w>s")

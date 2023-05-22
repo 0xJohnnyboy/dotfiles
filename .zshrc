@@ -7,6 +7,10 @@ source $ZSH/oh-my-zsh.sh
 # Homebrew
 export PATH="/opt/homebrew/bin:$PATH"
 
+# Go
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+
 # Nvim
 export EDITOR=nvim
 export NVIM_CONFIG="$HOME/.config/nvim/init.lua"
@@ -26,8 +30,11 @@ export BUN_INSTALL="/Users/johnnyboy/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH:/Users/johnnyboy/.local/share/solana/install/active_release/bin:$PATH:/Users/johnnyboy/Library/Python/3.8/bin:$PATH"
 
 # aliases
+alias c="clear"
 alias ll="ls -alh"
+alias l="exa --long -L 2 -T --git-ignore --git --icons"
 alias nv="nvim ."
+
 alias configure="nvim ~/.zshrc"
 alias refresh="source ~/.zshrc"
 alias shortcuts="nvim ~/.config/skhd/skhdrc"
@@ -65,16 +72,64 @@ function dsh() {
 }
 ## docker end
 
-## utility
+## tmux
+### returns a random word
+function get_random_word() {
+  local word=$(curl -s "https://random-word-api.herokuapp.com/word" | jq -r ".[0]")
+  echo $word
+}
 
-## make dir and jump into it
+### creates a new session with a name and tries to attach -- uses random words or timestamp if no argument is passed
+function tmns() {
+  local session_name="$1"
+
+  if [[ -z $session_name ]]; then
+    local word1=$(get_random_word)
+    local word2=$(get_random_word)
+
+    if [[ -z $word1 ]] || [[ -z $word2 ]]; then
+      session_name=$(date +"%Y%m%d%H%M%S")
+    else
+      session_name="${word1}-${word2}"
+    fi
+  fi
+
+  echo "$session_name"
+
+  tmux new-session -As "$session_name"
+}
+## tmux end
+
+## utility
+### format git files with prettier
+function pfmt() {
+  local option="$1"
+  local files
+
+  files=$(git diff --name-only)
+
+  if [[ "$option" == "-u" ]]; then
+    files+=($(git ls-files --others --exclude-standard))
+  fi
+
+  if [[ -z "$files" ]]; then
+    echo "Aucun fichier modifié trouvé."
+    return 1
+  fi
+
+  echo "Formatting files..."
+  echo "$files" | xargs npx prettier --write
+  echo "Done!"
+}
+
+### make dir and jump into it
 function mkcd() {
     mkdir -p ${1}
     cd ${1}
     echo "created and jumped into ${1}"
 }
 
-## remove current dir
+### remove current dir
 function rmc() {
     local cwd=$(pwd)
     cd ../
@@ -82,25 +137,29 @@ function rmc() {
     echo "${cwd} deleted"
 }
 
-## paste rs
+### paste rs
 function paste() {
     local file=${1:-/dev/stdin}
     curl --data-binary @${file} https://paste.rs
 }
 
-## delete paste rs
+### delete paste rs
 function dpaste() {
     local id=${1:-/dev/stdin}
     curl -X DELETE https://paste.rs/${id}
 }
 
-## get paste rs
+### get paste rs
 function gpaste() {
     local id=${1:-/dev/stdin}
     curl https://paste.rs/${id}
 }
+
 ## utility end
 
 
 # starship
 eval "$(starship init zsh)"
+
+# zoxide
+eval "$(zoxide init zsh)"

@@ -32,7 +32,7 @@ export PATH="$BUN_INSTALL/bin:$PATH:/Users/johnnyboy/.local/share/solana/install
 # aliases
 alias c="clear"
 alias ll="ls -alh"
-alias l="exa --long -L 2 -T --git-ignore --git --icons"
+alias l="exa --long -L 1 -T --git-ignore --git --icons"
 alias nv="nvim ."
 
 alias configure="nvim ~/.zshrc"

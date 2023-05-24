@@ -66,12 +66,20 @@ local leader_normal_mappings = {
         o = "Find old file",
         f = "Fuzze find file"
     },
+    D = {
+        name = "Database",
+        u = "Toggle UI",
+        f = "Find buffer",
+        r = "Rename buffer",
+        q = "Last query info",
+    },
     u = "Toggle undotree",
     l = {
         name = "LSP",
         a = "Code action"
     },
-    ["<Esc><Esc>"] = "Remove highlighting after search",
+    ["\\"] = "Remove highlighting after search",
+    ["rm"] = "Remove whitelines",
 }
 
 -- <LEADER> VISUAL MODE
@@ -105,7 +113,6 @@ local insert_opts = {
     silent = true
 }
 local insert_mappings = {
-    ["<C-b>"] = "Delete previous word",
 }
 -- REGISTER
 wk.register(leader_normal_mappings, leader_normal_opts)

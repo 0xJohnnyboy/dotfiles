@@ -113,6 +113,7 @@ local normal_mappings = {
         ["("] = "Toggle ( fold",
         ["]"] = "Toggle ] fold",
         ["["] = "Toggle [ fold",
+        ["T"] = "Toggle tag fold",
     }
 }
 

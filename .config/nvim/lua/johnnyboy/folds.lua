@@ -16,3 +16,4 @@ vim.keymap.set('n', 'z)', ':lua toggle_fold(")")<CR>', { noremap = true, silent 
 vim.keymap.set('n', 'z(', ':lua toggle_fold("(")<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'z]', ':lua toggle_fold("]")<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'z[', ':lua toggle_fold("[")<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', 'zT', ':lua toggle_fold("t")<CR>', { noremap = true, silent = true })

@@ -75,17 +75,19 @@ function dsh() {
 ## tmux
 ### returns a random word
 function get_random_word() {
-  local word=$(curl -s "https://random-word-api.herokuapp.com/word" | jq -r ".[0]")
-  echo $word
+    local type="$1"
+    local word=$(curl -s "https://random-word-form.herokuapp.com/random/$1" | jq -r ".[0]")
+    echo $word
 }
+
 
 ### creates a new session with a name and tries to attach -- uses random words or timestamp if no argument is passed
 function tmns() {
   local session_name="$1"
 
   if [[ -z $session_name ]]; then
-    local word1=$(get_random_word)
-    local word2=$(get_random_word)
+    local word1=$(get_random_word adjective)
+    local word2=$(get_random_word animal)
 
     if [[ -z $word1 ]] || [[ -z $word2 ]]; then
       session_name=$(date +"%Y%m%d%H%M%S")

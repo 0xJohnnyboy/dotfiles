@@ -105,6 +105,15 @@ local normal_opts = {
 local normal_mappings = {
     ["[d"] = "Go to next diagnostic",
     ["]d"] = "Go to previous diagnostic",
+    z = {
+        name = "Folds",
+        ["}"] = "Toggle } fold",
+        ["{"] = "Toggle { fold",
+        [")"] = "Toggle ) fold",
+        ["("] = "Toggle ( fold",
+        ["]"] = "Toggle ] fold",
+        ["["] = "Toggle [ fold",
+    }
 }
 
 -- INSERT MODE

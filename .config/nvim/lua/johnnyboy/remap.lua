@@ -19,6 +19,9 @@ km.set("n", "<leader>wv", "<C-w>v")
 km.set("n", "<leader>wvl", "<C-w>v<C-w>l")
 km.set("n", "<leader>wvh", "<C-w>v<C-w>h")
 km.set("n", "<leader>ww", "<C-w>n")
+km.set("n", "<leader>wx", "<C-w>x") -- swap with the split on the right
+km.set("n", "<leader>wr", "<C-w>r") -- rotates clockwise
+km.set("n", "<leader>wR", "<C-w>R") -- rotates counterclockwise
 km.set("n", "<leader>wc", "<C-w>q")
 km.set("n", "<leader>wj", "<C-w>j")
 km.set("n", "<leader>wk", "<C-w>k")

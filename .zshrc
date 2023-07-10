@@ -7,27 +7,14 @@ source $ZSH/oh-my-zsh.sh
 # Homebrew
 export PATH="/opt/homebrew/bin:$PATH"
 
-# Go
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-
 # Nvim
 export EDITOR=nvim
 export NVIM_CONFIG="$HOME/.config/nvim/init.lua"
-
-# Nvm
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
-# Capacitor
-export CAPACITOR_ANDROID_STUDIO_PATH="/Users/johnnyboy/Library/Application Support/JetBrains/Toolbox/apps/AndroidStudio/ch-0/212.5712.43.2112.8609683"
-
-# bun completions
-[ -s "/Users/johnnyboy/.bun/_bun" ] && source "/Users/johnnyboy/.bun/_bun"
-
-# Bun
-export BUN_INSTALL="/Users/johnnyboy/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH:/Users/johnnyboy/.local/share/solana/install/active_release/bin:$PATH:/Users/johnnyboy/Library/Python/3.8/bin:$PATH"
+ 
+# node
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # aliases
 alias c="clear"
@@ -37,7 +24,6 @@ alias nv="nvim ."
 
 alias configure="nvim ~/.zshrc"
 alias refresh="source ~/.zshrc"
-alias shortcuts="nvim ~/.config/skhd/skhdrc"
 
 # git aliases
 alias ga="git add"
@@ -49,7 +35,6 @@ alias gpl="git pull"
 alias gp="git push"
 alias gr="git rebase"
 alias gtr="git tree"
-alias gadog="git adog"
 alias gl="git log"
 
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
@@ -58,7 +43,6 @@ alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
 alias dls="docker container ls"
 alias drdi="docker rmi $(docker images -f "dangling=true" -q)"
 alias dsa="docker stop $(docker ps -q)"
-
 
 # functions
 
@@ -131,7 +115,65 @@ function mkcd() {
     echo "created and jumped into ${1}"
 }
 
-### remove current dir
+# format git files with prettier
+function pfmt() {
+  local option="$1"
+  local files
+
+  # Récupérer les fichiers modifiés (staged et non staged)
+  files=$(git diff --name-only)
+
+  # Inclure les fichiers non suivis (untracked) si l'option est fournie
+  if [[ "$option" == "-u" ]]; then
+    files+=($(git ls-files --others --exclude-standard))
+  fi
+
+  # Vérifier s'il y a des fichiers modifiés
+  if [[ -z "$files" ]]; then
+    echo "Aucun fichier modifié trouvé."
+    return 1
+  fi
+
+  # Exécuter la commande Prettier sur les fichiers modifiés
+  echo "Formatting files..."
+  echo "$files" | xargs npx prettier --write
+  echo "Done!"
+}
+
+# git adog with max count
+function gadog() {
+    local count="$1"
+    local cmd="git log --all --decorate --oneline --graph "
+
+    if [[ "$count" ]]; then
+        cmd+=" --max-count $count"
+    fi
+    eval "$cmd"
+}
+
+# gif modified files
+function gmf() {
+    local count=1
+
+    if [[ "$count" ]]; then
+        count="$1"
+    fi
+
+    local cmd="git diff --name-only HEAD HEAD~$count"
+    eval "$cmd"
+}
+
+## rename multiple files
+## function rnm() {
+##     local matcher="*"
+##     if ${3}; then
+##         matcher=${3}
+##     fi
+##     echo "replacing everything ${matcher} - ${1} with ${2}"
+##     rename 's/${1}/${2}/' ${matcher}
+## }
+
+## remove current dir
 function rmc() {
     local cwd=$(pwd)
     cd ../
@@ -165,3 +207,6 @@ eval "$(starship init zsh)"
 
 # zoxide
 eval "$(zoxide init zsh)"
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)

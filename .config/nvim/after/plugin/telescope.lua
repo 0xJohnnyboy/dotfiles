@@ -90,6 +90,7 @@ end
 telescope.setup()
 telescope.load_extension("file_browser")
 telescope.load_extension("live_grep_args")
+telescope.load_extension("notify")
 
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
 vim.keymap.set('n', '<leader>bl', builtin.buffers, {})
@@ -97,6 +98,7 @@ vim.keymap.set('n', '<leader>pf', builtin.git_files, {})
 vim.keymap.set('n', '<leader>fo', builtin.oldfiles, {})
 vim.keymap.set('n', '<leader>pg', builtin.git_status, {})
 vim.keymap.set('n', '<leader>pt', ':Telescope file_browser<CR>', {})
+vim.keymap.set('n', '<leader>pn', ':Telescope notify<CR>', {})
 vim.keymap.set("n", "<leader>ps", ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>")
 vim.keymap.set("n", "<leader>pV", live_grep_args_shortcuts.grep_visual_selection)
 

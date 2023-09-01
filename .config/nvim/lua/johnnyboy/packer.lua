@@ -9,28 +9,33 @@ return require('packer').startup(function(use)
         'nvim-telescope/telescope.nvim',
         requires = {
             { 'nvim-lua/plenary.nvim' },
-            { "nvim-telescope/telescope-live-grep-args.nvim" },
-            { "nvim-telescope/telescope-file-browser.nvim" },
+            { 'nvim-telescope/telescope-live-grep-args.nvim' },
+            { 'nvim-telescope/telescope-file-browser.nvim' },
         },
     }
+
+    use { 'nvim-tree/nvim-tree.lua',
+        requires = 'nvim-tree/nvim-web-devicons',
+    }
+
     -- use '~/projects/scretch'
     use {
-        "Sonicfury/scretch.nvim",
+        'Sonicfury/scretch.nvim',
         requires = 'nvim-telescope/telescope.nvim',
     }
     use {
-        "startup-nvim/startup.nvim",
-        requires = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
+        'startup-nvim/startup.nvim',
+        requires = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' },
     }
 
     use {
-        "folke/trouble.nvim",
-        requires = "nvim-tree/nvim-web-devicons",
+        'folke/trouble.nvim',
+        requires = 'nvim-tree/nvim-web-devicons',
     }
 
-    use "m4xshen/smartcolumn.nvim"
+    use 'm4xshen/smartcolumn.nvim'
     use 'ellisonleao/gruvbox.nvim'
-    use("nvim-treesitter/nvim-treesitter", { run = ':TSUpdate' })
+    use('nvim-treesitter/nvim-treesitter', { run = ':TSUpdate' })
     use 'mbbill/undotree'
     use 'tpope/vim-fugitive'
     use 'tpope/vim-surround'
@@ -61,7 +66,14 @@ return require('packer').startup(function(use)
     }
 
     use {
-        "folke/which-key.nvim",
+        'folke/noice.nvim',
+        requires = {
+            'MunifTanjim/nui.nvim',
+            'rcarriga/nvim-notify',
+        }
+    }
+    use {
+        'folke/which-key.nvim',
         config = function()
             vim.o.timeout = true
             vim.o.timeoutlen = 300
@@ -74,15 +86,15 @@ return require('packer').startup(function(use)
     }
 
     use {
-        "tpope/vim-dadbod",
+        'tpope/vim-dadbod',
         opt = true,
         requires = {
-            "kristijanhusak/vim-dadbod-ui",
-            "kristijanhusak/vim-dadbod-completion",
+            'kristijanhusak/vim-dadbod-ui',
+            'kristijanhusak/vim-dadbod-completion',
         },
         config = function()
-            require("config.dadbod").setup()
+            require('config.dadbod').setup()
         end,
-        cmd = { "DBUIToggle", "DBUI", "DBUIAddConnection", "DBUIFindBuffer", "DBUIRenameBuffer", "DBUILastQueryInfo" },
+        cmd = { 'DBUIToggle', 'DBUI', 'DBUIAddConnection', 'DBUIFindBuffer', 'DBUIRenameBuffer', 'DBUILastQueryInfo' },
     }
 end)

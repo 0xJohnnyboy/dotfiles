@@ -56,11 +56,16 @@ local leader_normal_mappings = {
     },
     p = {
         name = "Project",
-        v = "Default explorer",
         t = "Telescope explorer",
         f = "Search project files (git)",
         g = "Project git status",
         s = "Live grep",
+    },
+    e = {
+        name = "NvimTree",
+        e = "Toggle",
+        f = "Focus",
+        s = "Show file in tree",
     },
     f = {
         name = "Find",
@@ -83,6 +88,7 @@ local leader_normal_mappings = {
     },
     ["\\"] = "Remove highlighting after search",
     ["rm"] = "Remove whitelines",
+    ["mp"] = "Markdown preview with glow",
 }
 
 -- <LEADER> VISUAL MODE

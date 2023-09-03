@@ -165,3 +165,8 @@ eval "$(starship init zsh)"
 
 # zoxide
 eval "$(zoxide init zsh)"
+
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)
+export PATH="/usr/local/opt/libpq/bin:$PATH"

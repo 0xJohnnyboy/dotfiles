@@ -44,7 +44,7 @@ local leader_normal_mappings = {
         d = "Close buffer",
         l = "List buffers",
         r = "Refresh buffers (redraw)",
-        x = "Close all but the current one",
+        x = "Close all buffers but the current one",
     },
     c = {
         name = "Comment",
@@ -56,10 +56,16 @@ local leader_normal_mappings = {
     },
     p = {
         name = "Project",
-        v = "Default explorer",
         t = "Telescope explorer",
         f = "Search project files (git)",
+        g = "Project git status",
         s = "Live grep",
+    },
+    e = {
+        name = "NvimTree",
+        e = "Toggle",
+        f = "Focus",
+        s = "Show file in tree",
     },
     f = {
         name = "Find",
@@ -76,10 +82,13 @@ local leader_normal_mappings = {
     u = "Toggle undotree",
     l = {
         name = "LSP",
-        a = "Code action"
+        a = "Code action",
+        f = "Format",
+        o = "Open diagnostics float window",
     },
     ["\\"] = "Remove highlighting after search",
     ["rm"] = "Remove whitelines",
+    ["mp"] = "Markdown preview with glow",
 }
 
 -- <LEADER> VISUAL MODE
@@ -114,6 +123,13 @@ local normal_mappings = {
         ["]"] = "Toggle ] fold",
         ["["] = "Toggle [ fold",
         ["T"] = "Toggle tag fold",
+    },
+    g = {
+        d = "Go to definition",
+        D = "Go to declaration",
+        I = "Go to implementation",
+        o = "Go to type definition",
+        r = "Go to type references",
     }
 }
 

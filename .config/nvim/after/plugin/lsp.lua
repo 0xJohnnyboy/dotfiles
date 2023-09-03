@@ -14,6 +14,13 @@ lsp.on_attach(function(client, bufnr)
     lsp.default_keymaps({ buffer = bufnr })
 
     vim.keymap.set("n", "<leader>la", function () vim.lsp.buf.code_action() end)
+    vim.keymap.set("n", "<leader>lf", function () vim.lsp.buf.format() end)
+    vim.keymap.set("n", "<leader>lo", function () vim.lsp.buf.open_float() end)
+    vim.keymap.set("n", "gd", function () vim.lsp.buf.definition() end)
+    vim.keymap.set("n", "gD", function () vim.lsp.buf.declaration() end)
+    vim.keymap.set("n", "gI", function () vim.lsp.buf.implementation() end)
+    vim.keymap.set("n", "go", function () vim.lsp.buf.type_definition() end)
+    vim.keymap.set("n", "gr", function () vim.lsp.buf.references() end)
 end)
 
 -- (Optional) Configure lua language server for neovim

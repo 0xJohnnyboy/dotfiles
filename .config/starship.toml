@@ -1,8 +1,6 @@
 # Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
-format =  '''
-\$ $username $directory $git_branch $fill $git_state $git_status $nodejs $lua $docker_context $memory_usage
-'''
+format =  '''\$ $username $directory $git_branch $fill $git_state $git_status $nodejs $lua $docker_context $memory_usage '''
 add_newline = true
 
 [fill]
@@ -34,9 +32,11 @@ deleted = '🗑 '
 
 [memory_usage]
 disabled = false
-threshold = 70
+threshold = 80
 symbol = '🧠 '
-style = 'bold dimmed red'
+style = 'bold black bg:dimmed bg:red'
+# format = ' [ $symbol RAM:${ram_pct} | SWAP: ${swap_pct} ]($style) '
+# format = 'via $symbol [${ram}( \| ${swap})]($style) '
 
 [docker_context]
 format = '[ 🐋 $context ](blue bold)'

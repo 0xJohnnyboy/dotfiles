@@ -4,14 +4,17 @@ local km = vim.keymap
 km.set("n", "<leader>rw", ":g/^$/d<CR>")
 -- search
 km.set("n", "<leader>\\", ":noh<CR>")
--- explorer
-km.set("n", "<leader>pv", vim.cmd.Ex)
 -- buffers
 km.set("n", "<leader>bn", ":bnext<CR>")
 km.set("n", "<leader>bp", ":bprevious<CR>")
 km.set("n", "<leader>bd", ":bd!<CR>")
 km.set("n", "<leader>br", ":redraw<CR>")
 km.set("n", "<leader>bx", ":%bd|e#<CR>")
+--tabs
+km.set("n", "<leader>tt", ":tabnew<CR>")
+km.set("n", "<leader>tc", ":tabclose<CR>")
+km.set("n", "<leader>tn", ":tabnext<CR>")
+km.set("n", "<leader>tp", ":tabprev<CR>")
 -- window splits
 km.set("n", "<leader>ws", "<C-w>s")
 km.set("n", "<leader>wsj", "<C-w>s<C-w>j")

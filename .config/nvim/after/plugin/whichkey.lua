@@ -19,6 +19,13 @@ local leader_normal_mappings = {
         k = "Focus up",
         l = "Focus right",
     },
+    t = {
+        name = "Tabs",
+        t = "New",
+        c = "Close",
+        n = "Next",
+        p = "Prev",
+    },
     s = {
         name = "Scretch.nvim",
         n = "New scretch",

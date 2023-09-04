@@ -1,4 +1,6 @@
-require("notify").setup({
+local notify = require("notify")
+
+notify.setup({
     background_colour = "#000000",
     fps = 30,
     icons = {
@@ -12,6 +14,8 @@ require("notify").setup({
     minimum_width = 50,
     render = "default",
     stages = "fade_in_slide_out",
-    timeout = 4000,
+    timeout = 3000,
     top_down = true
 })
+
+vim.keymap.set("n", "<leader>nc", notify.dismiss, {})

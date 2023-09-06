@@ -20,7 +20,6 @@ export NVM_DIR="$HOME/.nvm"
 alias c="clear"
 alias ll="ls -alh"
 alias l="exa --long -L 1 -T --git-ignore --git --icons"
-alias nv="nvim ."
 
 alias configure="nvim ~/.zshrc"
 alias refresh="source ~/.zshrc"
@@ -40,9 +39,11 @@ alias gl="git log"
 alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
 
 # docker aliases
-alias dls="docker container ls"
-alias drdi="docker rmi $(docker images -f "dangling=true" -q)"
-alias dsa="docker stop $(docker ps -q)"
+if [[ -z docker ]]; then
+    alias dls="docker container ls"
+    alias drdi="docker rmi $(docker images -f "dangling=true" -q)"
+    alias dsa="docker stop $(docker ps -q)"
+fi
 
 # functions
 

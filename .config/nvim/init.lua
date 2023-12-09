@@ -9,6 +9,7 @@ vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 vim.opt.expandtab = true
 vim.wo.scrolloff = 20
+local km = vim.keymap
 
 -- LAZY
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -25,16 +26,28 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-    { "ellisonleao/gruvbox.nvim",         priority = 1000,  config = true, opts = ... },
+    { "ellisonleao/gruvbox.nvim",        priority = 1000,    config = true, opts = ... },
     'nvim-lualine/lualine.nvim',
     'numToStr/Comment.nvim',
     'Sonicfury/scretch.nvim',
     'm4xshen/smartcolumn.nvim',
     'mbbill/undotree',
     'nvim-tree/nvim-tree.lua',
-    { 'nvim-treesitter/nvim-treesitter',  build = ':TSUpdate' },
+    { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
 
-    -- lsp
+    -- Telescope
+    {
+        'nvim-telescope/telescope.nvim',
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'nvim-telescope/telescope-live-grep-args.nvim',
+            'nvim-telescope/telescope-file-browser.nvim',
+            'natecraddock/telescope-zf-native.nvim'
+
+        },
+    },
+
+    -- LSP
     { 'williamboman/mason.nvim' },
     { 'williamboman/mason-lspconfig.nvim' },
     { 'VonHeikemen/lsp-zero.nvim',        branch = 'v3.x' },
@@ -54,12 +67,14 @@ require("lazy").setup({
         init = function()
             vim.o.timeout = true
             vim.o.timeoutlen = 300
-        end,
-        opts = {
-        }
+        end
     },
     { 'folke/trouble.nvim', dependencies = { "nvim-tree/nvim-web-devicons" } },
-    { "folke/noice.nvim",   event = "VeryLazy",                            dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" } },
+    {
+        "folke/noice.nvim",
+        event = "VeryLazy",
+        dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" }
+    }
 })
 
 -- theme
@@ -137,17 +152,17 @@ local function tab_win_closed(winnr)
     local tab_bufs = vim.tbl_map(vim.api.nvim_win_get_buf, tab_wins)
     if buf_info.name:match(".*NvimTree_%d*$") then -- close buffer was nvim tree
         -- Close all nvim tree on :q
-        if not vim.tbl_isempty(tab_bufs) then    -- and was not the last window (not closed automatically by code below)
+        if not vim.tbl_isempty(tab_bufs) then      -- and was not the last window (not closed automatically by code below)
             api.tree.close()
         end
-    else                                                  -- else closed buffer was normal buffer
-        if #tab_bufs == 1 then                            -- if there is only 1 buffer left in the tab
+    else                                                          -- else closed buffer was normal buffer
+        if #tab_bufs == 1 then                                    -- if there is only 1 buffer left in the tab
             local last_buf_info = vim.fn.getbufinfo(tab_bufs[1])[1]
-            if last_buf_info.name:match(".*NvimTree_%d*$") then -- and that buffer is nvim tree
+            if last_buf_info.name:match(".*NvimTree_%d*$") then   -- and that buffer is nvim tree
                 vim.schedule(function()
-                    if #vim.api.nvim_list_wins() == 1 then -- if its the last buffer in vim
-                        vim.cmd "quit"                    -- then close all of vim
-                    else                                  -- else there are more tabs open
+                    if #vim.api.nvim_list_wins() == 1 then        -- if its the last buffer in vim
+                        vim.cmd "quit"                            -- then close all of vim
+                    else                                          -- else there are more tabs open
                         vim.api.nvim_win_close(tab_wins[1], true) -- then close only the tab
                     end
                 end)
@@ -407,14 +422,14 @@ cmp.setup({
 lsp.on_attach(function(client, bufnr)
     lsp.default_keymaps({ buffer = bufnr })
 
-    vim.keymap.set("n", "<leader>la", function() vim.lsp.buf.code_action() end)
-    vim.keymap.set("n", "<leader>lf", function() vim.lsp.buf.format() end)
-    vim.keymap.set("n", "<leader>lo", function() vim.lsp.buf.open_float() end)
-    vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end)
-    vim.keymap.set("n", "gD", function() vim.lsp.buf.declaration() end)
-    vim.keymap.set("n", "gI", function() vim.lsp.buf.implementation() end)
-    vim.keymap.set("n", "go", function() vim.lsp.buf.type_definition() end)
-    vim.keymap.set("n", "gr", function() vim.lsp.buf.references() end)
+    km.set("n", "<leader>la", function() vim.lsp.buf.code_action() end)
+    km.set("n", "<leader>lf", function() vim.lsp.buf.format() end)
+    km.set("n", "<leader>lo", function() vim.lsp.buf.open_float() end)
+    km.set("n", "gd", function() vim.lsp.buf.definition() end)
+    km.set("n", "gD", function() vim.lsp.buf.declaration() end)
+    km.set("n", "gI", function() vim.lsp.buf.implementation() end)
+    km.set("n", "go", function() vim.lsp.buf.type_definition() end)
+    km.set("n", "gr", function() vim.lsp.buf.references() end)
 end)
 
 cmp.setup({
@@ -463,8 +478,18 @@ local smartcolumn_config = {
 
 require("smartcolumn").setup(smartcolumn_config)
 
+-- Telescope
+local telescope = require('telescope')
+local builtin = require('telescope.builtin')
+local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
+
+telescope.setup()
+telescope.load_extension("file_browser")
+telescope.load_extension("live_grep_args")
+telescope.load_extension("zf-native")
+telescope.load_extension("notify")
+
 -- Remaps
-local km = vim.keymap
 -- edition
 km.set("n", "<leader>rw", ":g/^$/d<CR>")
 -- search
@@ -496,6 +521,16 @@ km.set("n", "<leader>wk", "<C-w>k")
 km.set("n", "<leader>wh", "<C-w>h")
 km.set("n", "<leader>wl", "<C-w>l")
 km.set("n", "<leader>mp", ":rightbelow vsplit | terminal glow %<CR>")
+-- Telescope
+km.set('n', '<leader>ff', builtin.find_files, {})
+km.set('n', '<leader>bl', builtin.buffers, {})
+km.set('n', '<leader>pf', builtin.git_files, {})
+km.set('n', '<leader>fo', builtin.oldfiles, {})
+km.set('n', '<leader>pg', builtin.git_status, {})
+km.set('n', '<leader>pt', ':Telescope file_browser<CR>', {})
+km.set('n', '<leader>pn', ':Telescope notify<CR>', {})
+km.set("n", "<leader>ps", ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>")
+km.set("n", "<leader>pV", live_grep_args_shortcuts.grep_visual_selection)
 -- notify
 km.set("n", "<leader>nc", notify.dismiss, {})
 -- nvim tree

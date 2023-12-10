@@ -19,7 +19,8 @@ export NVM_DIR="$HOME/.nvm"
 # aliases
 alias c="clear"
 alias ll="ls -alh"
-alias l="exa --long -L 1 -T --git-ignore --git --icons"
+alias l="eza --long -L 1 -T --git-ignore --git --icons"
+alias gep="generate_password"
 
 alias configure="nvim ~/.zshrc"
 alias refresh="source ~/.zshrc"
@@ -200,6 +201,24 @@ function gpaste() {
     curl https://paste.rs/${id}
 }
 
+## generate a secure password using custom pattern into the clipboard
+function generate_password() {
+
+    sudo -v
+
+    if [ $? -eq 0 ]; then
+        source ~/.secure/apply_pattern.sh
+
+        local input_string="$1"
+
+        echo "$(apply_pattern $input_string)" | pbcopy
+        echo "Mot de passe copié !"
+        unset -f apply_pattern
+    else
+        echo "Mot de passe incorrect"
+    fi
+}
+
 ## utility end
 
 
@@ -211,3 +230,6 @@ eval "$(zoxide init zsh)"
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)
+
+# opam configuration
+[[ ! -r /Users/johnnyboy/.opam/opam-init/init.zsh ]] || source /Users/johnnyboy/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null

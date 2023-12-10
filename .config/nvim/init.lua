@@ -32,8 +32,38 @@ require("lazy").setup({
     'Sonicfury/scretch.nvim',
     'm4xshen/smartcolumn.nvim',
     'mbbill/undotree',
-    'nvim-tree/nvim-tree.lua',
     { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
+
+    -- Fern
+    {
+        'lambdalisue/fern.vim',
+        dependencies = {
+            'lambdalisue/fern-hijack.vim',
+            'lambdalisue/nerdfont.vim',
+            'lambdalisue/fern-renderer-nerdfont.vim',
+            'lambdalisue/fern-git-status.vim',
+            {
+                'yuki-yano/fern-preview.vim',
+                keys = {
+                    { 'p',     '<Plug>(fern-action-preview:toggle)',           ft = "fern" },
+                    { '<C-j>', '<Plug>(fern-action-preview:scroll:down:half)', ft = "fern" },
+                    { '<C-k>', '<Plug>(fern-action-preview:scroll:up:half)',   ft = "fern" },
+                    { '<C-o>', '<Plug>(fern-action-open:select)',              ft = "fern" },
+                    { '<C-v>', '<Plug>(fern-action-open:vsplit)',              ft = "fern" },
+                    { 'n',     '<Plug>(fern-action-new-path)',                 ft = "fern" },
+                    { 'r',     '<Plug>(fern-action-rename)',                   ft = "fern" },
+                    { 'm',     '<Plug>(fern-action-move)',                     ft = "fern" },
+                    { 'c',     '<Plug>(fern-action-copy)',                     ft = "fern" },
+                    { 't',     '<Plug>(fern-action-remove)',                   ft = "fern" },
+                    { ',',     '<Plug>(fern-action-mark:toggle)',              ft = "fern" },
+                    { 'd',     '<Plug>(fern-action-diff)',                     ft = "fern" },
+                    { 'H',     '<Plug>(fern-action-hidden-toggle)',            ft = "fern" },
+                    { 'h',     '<Plug>(fern-action-collapse)',                 ft = "fern" },
+                    { '-',     '<Plug>(fern-action-cd)',                       ft = "fern" }
+                }
+            }
+        }
+    },
 
     -- Telescope
     {
@@ -59,6 +89,7 @@ require("lazy").setup({
     -- Tim Pope
     'tpope/vim-surround',
     'tpope/vim-eunuch',
+    'tpope/vim-speeddating',
 
     -- Folke
     {
@@ -73,9 +104,13 @@ require("lazy").setup({
     {
         "folke/noice.nvim",
         event = "VeryLazy",
-        dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" }
-    }
-})
+        opts = {
+        },
+        dependencies = {
+            "MunifTanjim/nui.nvim",
+            "rcarriga/nvim-notify",
+        }
+    } })
 
 -- theme
 -- Gruvbox initialization
@@ -127,56 +162,6 @@ notify.setup({
     stages = "fade_in_slide_out",
     timeout = 3000,
     top_down = true
-})
-
--- nvim tree
-require("nvim-tree").setup({
-    sort_by = "case_sensitive",
-    view = {
-        width = 60,
-    },
-    renderer = {
-        group_empty = true,
-    },
-    filters = {
-        dotfiles = true,
-    },
-})
-
-local function tab_win_closed(winnr)
-    local api = require "nvim-tree.api"
-    local tabnr = vim.api.nvim_win_get_tabpage(winnr)
-    local bufnr = vim.api.nvim_win_get_buf(winnr)
-    local buf_info = vim.fn.getbufinfo(bufnr)[1]
-    local tab_wins = vim.tbl_filter(function(w) return w ~= winnr end, vim.api.nvim_tabpage_list_wins(tabnr))
-    local tab_bufs = vim.tbl_map(vim.api.nvim_win_get_buf, tab_wins)
-    if buf_info.name:match(".*NvimTree_%d*$") then -- close buffer was nvim tree
-        -- Close all nvim tree on :q
-        if not vim.tbl_isempty(tab_bufs) then      -- and was not the last window (not closed automatically by code below)
-            api.tree.close()
-        end
-    else                                                          -- else closed buffer was normal buffer
-        if #tab_bufs == 1 then                                    -- if there is only 1 buffer left in the tab
-            local last_buf_info = vim.fn.getbufinfo(tab_bufs[1])[1]
-            if last_buf_info.name:match(".*NvimTree_%d*$") then   -- and that buffer is nvim tree
-                vim.schedule(function()
-                    if #vim.api.nvim_list_wins() == 1 then        -- if its the last buffer in vim
-                        vim.cmd "quit"                            -- then close all of vim
-                    else                                          -- else there are more tabs open
-                        vim.api.nvim_win_close(tab_wins[1], true) -- then close only the tab
-                    end
-                end)
-            end
-        end
-    end
-end
-
-vim.api.nvim_create_autocmd("WinClosed", {
-    callback = function()
-        local winnr = tonumber(vim.fn.expand("<amatch>"))
-        vim.schedule_wrap(tab_win_closed(winnr))
-    end,
-    nested = true
 })
 
 local wk = require("which-key")
@@ -471,7 +456,7 @@ end
 -- smart column
 local smartcolumn_config = {
     colorcolumn = "120",
-    disabled_filetypes = { "help", "text", "markdown" },
+    disabled_filetypes = { "help", "text", "markdown", "fern" },
     custom_colorcolumn = {},
     scope = "line",
 }
@@ -482,12 +467,15 @@ require("smartcolumn").setup(smartcolumn_config)
 local telescope = require('telescope')
 local builtin = require('telescope.builtin')
 local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
+local noice = require('noice')
 
 telescope.setup()
 telescope.load_extension("file_browser")
 telescope.load_extension("live_grep_args")
 telescope.load_extension("zf-native")
 telescope.load_extension("notify")
+
+vim.g['fern#renderer'] = 'nerdfont'
 
 -- Remaps
 -- edition
@@ -533,10 +521,11 @@ km.set("n", "<leader>ps", ":lua require('telescope').extensions.live_grep_args.l
 km.set("n", "<leader>pV", live_grep_args_shortcuts.grep_visual_selection)
 -- notify
 km.set("n", "<leader>nc", notify.dismiss, {})
--- nvim tree
-km.set('n', '<leader>ee', ':NvimTreeToggle<CR>', { silent = true })
-km.set('n', '<leader>ef', ':NvimTreeFocus<CR>', { silent = true })
-km.set('n', '<leader>es', ':NvimTreeFindFile!<CR>', { silent = true })
+km.set("n", "<leader>nl", function() noice.cmd("last") end)
+km.set("n", "<leader>nh", function() noice.cmd("history") end)
+-- fern
+km.set("n", "<leader>ee", ":Fern . -drawer -width=60 -toggle -right<CR>", { silent = true, noremap = true })
+km.set("n", "<leader>es", ":Fern . -reveal=% -drawer -width=60 -toggle -right<CR>", { silent = true, noremap = true })
 -- Trouble
 km.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>", { silent = true, noremap = true })
 km.set("n", "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", { silent = true, noremap = true })

@@ -19,7 +19,7 @@ export NVM_DIR="$HOME/.nvm"
 # aliases
 alias c="clear"
 alias ll="ls -alh"
-alias l="eza --long -L 1 -T --git-ignore --git --icons"
+alias l="eza --long -L 1 -a -T --git-ignore --git --icons"
 alias gep="generate_password"
 
 alias configure="nvim ~/.zshrc"

@@ -100,6 +100,12 @@ require("lazy").setup({
             vim.o.timeoutlen = 300
         end
     },
+    {
+        "folke/todo-comments.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        opts = {
+        }
+    },
     { 'folke/trouble.nvim', dependencies = { "nvim-tree/nvim-web-devicons" } },
     {
         "folke/noice.nvim",
@@ -511,6 +517,7 @@ km.set("n", "<leader>wl", "<C-w>l")
 km.set("n", "<leader>mp", ":rightbelow vsplit | terminal glow %<CR>")
 -- Telescope
 km.set('n', '<leader>ff', builtin.find_files, {})
+km.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { silent = true, noremap = true })
 km.set('n', '<leader>bl', builtin.buffers, {})
 km.set('n', '<leader>pf', builtin.git_files, {})
 km.set('n', '<leader>fo', builtin.oldfiles, {})
@@ -533,6 +540,7 @@ km.set("n", "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", { silen
 km.set("n", "<leader>xl", "<cmd>TroubleToggle loclist<cr>", { silent = true, noremap = true })
 km.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { silent = true, noremap = true })
 km.set("n", "<leader>xR", "<cmd>TroubleToggle lsp_references<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>xt", "<cmd>TodoTrouble<cr>", { silent = true, noremap = true })
 -- Scretch
 km.set('n', '<leader>sn', scretch.new)
 km.set('n', '<leader>snn', scretch.new_named)

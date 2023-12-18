@@ -481,7 +481,30 @@ telescope.load_extension("live_grep_args")
 telescope.load_extension("zf-native")
 telescope.load_extension("notify")
 
+-- Fern
 vim.g['fern#renderer'] = 'nerdfont'
+
+-- Ajoute cette fonction à ton init.lua
+function close_nvim_if_last_fern_buffer()
+    -- Vérifie si le seul buffer ouvert a un filetype "fern"
+    local num_windows = vim.fn.winnr('$') - 1
+    print(num_windows)
+
+    if num_windows == 1 and vim.api.nvim_buf_get_option(0, 'filetype') == 'fern' then
+        vim.cmd('qall!')
+    end
+end
+
+-- Ajoute cette autocmd pour appeler la fonction avant de quitter Neovim
+vim.api.nvim_exec(
+[[
+augroup CloseNvimIfLastFernBuffer
+    autocmd!
+    autocmd WinClosed,WinClosed,VimLeavePre lua close_nvim_if_last_fern_buffer()
+augroup END
+]],
+false)
+
 
 -- Remaps
 -- edition

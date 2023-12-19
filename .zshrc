@@ -19,7 +19,7 @@ export NVM_DIR="$HOME/.nvm"
 # aliases
 alias c="clear"
 alias ll="ls -alh"
-alias l="eza --long -L 1 -a -T --git-ignore --git --icons"
+alias l="exa --long -L 1 -a -T --git-ignore --git --icons"
 
 alias configure="nvim ~/.zshrc"
 alias refresh="source ~/.zshrc"
@@ -99,9 +99,22 @@ function tmns() {
 ### format git files with prettier
 function pfmt() {
   local option="$1"
+  local branch="$2"
   local files
 
-  files=$(git diff --name-only)
+  files=$(git diff HEAD~1 --name-only)
+
+  if [[ "$option" == "-b" ]]; then
+      if [[ -z "$branch" ]]; then
+          echo "branch missing after option -b."
+      fi
+      if ! git rev-parse --verify "$branch" > /dev/null 2>&1; then
+          echo "Branch '$branch' does not exist."
+          return 1
+      fi
+
+      files=$(git diff $branch --name-only)
+  fi
 
   if [[ "$option" == "-u" ]]; then
     files+=($(git ls-files --others --exclude-standard))
@@ -127,10 +140,26 @@ function mkcd() {
 # format git files with prettier
 function pfmt() {
   local option="$1"
+  local branch="$2"
   local files
 
   # Récupérer les fichiers modifiés (staged et non staged)
   files=$(git diff --name-only)
+
+  if [[ "$option" == "-b" ]]; then
+    if [[ -z "$branch" ]]; then
+      echo "-b is missing branch name."
+      return 1
+    fi
+
+    # Vérifier que la branche existe
+    if ! git rev-parse --quiet --verify "$branch" > /dev/null; then
+      echo "Branch '$branch' does not exist."
+      return 1
+    fi
+
+    files=($(git diff $branch --name-only))
+  fi
 
   # Inclure les fichiers non suivis (untracked) si l'option est fournie
   if [[ "$option" == "-u" ]]; then
@@ -170,6 +199,23 @@ function gmf() {
 
     local cmd="git diff --name-only HEAD HEAD~$count"
     eval "$cmd"
+}
+
+function goto() {
+  local search_dir="."
+
+  if [[ "$1" ]]; then
+    search_dir="$1"
+  fi
+
+  local selected_path
+  selected_path=$(find "$search_dir" | zf | xargs -I {} realpath "{}")
+
+  if [[ -n "$selected_path" ]]; then
+    cd "$(dirname "$selected_path")" || return  # Change de répertoire
+  else
+    echo "No path selected"
+  fi
 }
 
 ## rename multiple files

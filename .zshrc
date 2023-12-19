@@ -36,7 +36,7 @@ alias gr="git rebase"
 alias gtr="git tree"
 alias gl="git log"
 
-alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
+alias dot="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
 
 # docker aliases
 # alias dls="docker container ls"

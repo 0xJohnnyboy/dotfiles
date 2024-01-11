@@ -1,7 +1,7 @@
 source $HOME/.config/sketchybar/vars.sh
 
 # How the bar shows up
-sketchybar --bar position=bottom\
+sketchybar --bar position=top\
                  sticky=true\
                  height=$HEIGHT\
                  y_offset=0\
@@ -15,9 +15,9 @@ sketchybar --bar position=bottom\
 # What are items's default values
 sketchybar --default updates=when_shown\
                      drawing=on\
-                     icon.font="Hack Nerd Font:Bold:14.0"\
+                     icon.font="${ICONS_FONT}:${ICONS_FONT_STYLE}:${ICONS_FONT_SIZE}"\
                      icon.color=$LIGHT_COLOR\
-                     label.font="Jetbrains Mono:Bold:12.0"\
+                     label.font="${TEXT_FONT}:${TEXT_FONT_STYLE}:${TEXT_FONT_SIZE}"\
                      label.color=$LIGHT_COLOR\
                      label.padding_left=4\
                      label.padding_right=4\
@@ -28,13 +28,30 @@ sketchybar --default updates=when_shown\
                      background.padding_right=4\
                      background.padding_left=4
 
+sketchybar --add item focused center \
+           --set focused script="$PLUGIN_DIR/focused.sh" \
+           --subscribe focused front_app_switched
+
 sketchybar --add item clock right\
 	   --set clock update_freq=10 script="$PLUGIN_DIR/clock.sh"
 
 sketchybar --add item battery right\
 	   --set battery update_freq=10 script="$PLUGIN_DIR/battery.sh"
 
-sketchybar --add item music center\
+
+sketchybar --add item  ip_address right                              \
+           --set       ip_address script="$PLUGIN_DIR/ip_address.sh" \
+                                  update_freq=60                     \
+                                  padding_left=2                     \
+                                  padding_right=8                    \
+                                  background.border_width=0          \
+                                  background.corner_radius=$RADIUS   \
+                                  background.height=18               \
+                                  icon.highlight=on                  \
+                                  label.highlight=on                 \
+           --subscribe ip_address wifi_change                        \
+
+sketchybar --add item music right\
 	   --set music update_freq=10 script="$PLUGIN_DIR/music.sh"
 
 sketchybar --add item space_name_1 left\
@@ -42,6 +59,7 @@ sketchybar --add item space_name_1 left\
 
 sketchybar --add item space_name_2 left\
 		 drawing=on
+
 # Spaces setup
 DISPLAY_1_SPACES=('Chat' 'Code' 'Web' 'Misc')
 DISPLAY_1_ICONS=('􀘲' '􀪏' '􀢌' '􀬓')

@@ -2,7 +2,8 @@
 
 source $HOME/.config/sketchybar/vars.sh
 
-sketchybar --set $NAME\
+sketchybar --animate tanh 6\
+                --set $NAME\
                  icon.highlight=$SELECTED\
                  background.drawing=$SELECTED
 

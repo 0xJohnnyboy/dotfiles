@@ -1,0 +1,104 @@
+---
+- name: close running apps
+  hosts: localhost
+  tasks:
+    - name: close apps
+      command: "osascript -e 'tell application \"System Events\" to quit'"
+
+- name: check and install brewfile formulae and casks
+  hosts: localhost
+  tasks:
+    - name: check if formula already exists
+      command: "brew list --formula {{ item }}"
+      register: brew_check
+      failed_when: false
+      changed_when: false
+      ignore_errors: true
+      loop: "{{ brewfile_apps }}"
+      loop_control:
+        loop_var: item
+
+    - name: check if cask already exists
+      command: "brew list --cask {{ item }}"
+      register: cask_check
+      failed_when: false
+      changed_when: false
+      ignore_errors: true
+      loop: "{{ brewfile_casks }}"
+      loop_control:
+        loop_var: item
+
+    - name: install formulae from brewfile
+      become: yes
+      homebrew_installed:
+        name: "{{ item }}"
+      when: item not in brew_check.results | map(attribute='stdout_lines') | join('\n')
+      loop: "{{ brewfile_apps }}"
+
+    - name: install casks from brewfile
+      become: yes
+      homebrew_cask:
+        name: "{{ item }}"
+      when: item not in cask_check.results | map(attribute='stdout_lines') | join('\n')
+      loop: "{{ brewfile_casks }}"
+
+- name: plist edits
+  hosts: localhost
+  tasks:
+    - name: edit dock plist
+      command: "defaults write com.apple.dock {{ item.key }} {{ item.value }}"
+      with_items:
+        - { key: "autohide", value: "-int 1" }
+        - { key: "largesize", value: "-int 90" }
+        - { key: "tilesize", value: "-int 32" }
+        - { key: "mineffect", value: "suck" }
+        - { key: "autohide-delay", value: "0" }
+        - { key: "magnification", value: "1" }
+        - { key: "orientation", value: "left" }
+        - { key: "show-recents", value: "0" }
+        - { key: "showAppExposeGestureEnabled", value: "1" }
+        - { key: "trash-full", value: "0" }
+        - { key: "persistent-apps", value: "-array" }
+        - { key: "persistent-apps", value: "-array-add '{\"tile-type\"=\"spacer-tile\";}'" }
+
+    - name: edit finder plist
+      command: "defaults write com.apple.finder {{ item.key }} {{ item.value }}"
+      with_items:
+        - { key: "FXEnableExtensionsChangeWarning", value:"-bool false" }
+        - { key: "ShowStatusBar", value:"-bool true" }
+        - { key: "ShowPathbar", value:"-bool true" }
+        - { key: "ShowRecentTags", value:"-bool false" }
+        - { key: "QuitMenuItem", value:"-bool true" }
+        - { key: "SidebarWidth", value:"-int 175" }
+        - { key: "WarnOnEmptyTrash", value:"-bool false" }
+        - { key: "FXPreferredViewStyle", value:"clmv" }
+
+    - name: remove $HOME DS_Store
+      command: "rm -rf $HOME/.DS_Store"
+
+    - name: disable "are you sure you want to open this app"
+      command: "defaults write com.apple.LaunchServices LSQuarantine -bool false"
+
+    - name: edit global plist
+      command: "defaults write -g {{ item.domain }} {{ item.value }}"
+      with_items:
+        - { domain: "com.apple.swipescrolldirection", value: "value" }
+        - { domain: "AppleInterfaceStyleSwitchesAutomatically", value: "1" }
+        - { domain: "NSAutomaticCapitalizationEnabled", value: "-bool false" }
+        - { domain: "NSAutomaticPeriodSubstitutionEnabled", value: "-bool false" }
+        - { domain: "NSAutomaticQuoteSubstitutionEnabled", value: "-bool false" }
+        - { domain: "NSAutomaticDashSubstitutionEnabled", value: "-bool false" }
+        - { domain: "NSAutomaticCapitalizationEnabled", value: "-bool false" }
+        - { domain: "NSAutomaticSpellingCorrectionEnabled", value: "-bool false" }
+        - { domain: "NSAutomaticTextCompletionEnabled", value: "-bool false" }
+        - { domain: "AppleShowAllExtensions", value: "-bool true" }
+        - { domain: "AppleWindowTabbingMode", value: "always" }
+        - { domain: "KeyRepeat", value: "-int 1" }
+        - { domain: "InitialKeyRepeat", value: "-int 12" }
+
+- name: offer reboot
+  hosts: localhost
+  tasks:
+    - name: offer reboot
+      command: "osascript -e 'tell app \"System Events\" to restart'"
+

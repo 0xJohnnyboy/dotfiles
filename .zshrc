@@ -233,3 +233,16 @@ source <(ng completion script)
 
 # opam configuration
 [[ ! -r /Users/johnnyboy/.opam/opam-init/init.zsh ]] || source /Users/johnnyboy/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/johnnyboy/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/johnnyboy/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/johnnyboy/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/johnnyboy/google-cloud-sdk/completion.zsh.inc'; fi
+
+# bun completions
+[ -s "/Users/johnnyboy/.bun/_bun" ] && source "/Users/johnnyboy/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

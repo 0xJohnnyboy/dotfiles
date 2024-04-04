@@ -567,8 +567,11 @@ km.set("n", "<leader>xt", "<cmd>TodoTrouble<cr>", { silent = true, noremap = tru
 -- Scretch
 km.set('n', '<leader>sn', scretch.new)
 km.set('n', '<leader>snn', scretch.new_named)
+km.set('n', '<leader>sft', scretch.new_from_template)
+km.set('n', '<leader>sat', scretch.save_as_template)
 km.set('n', '<leader>sl', scretch.last)
 km.set('n', '<leader>ss', scretch.search)
+km.set('n', '<leader>st', scretch.edit_template)
 km.set('n', '<leader>sg', scretch.grep)
 km.set('n', '<leader>sv', scretch.explore)
 -- undotree

@@ -20,6 +20,7 @@ export NVM_DIR="$HOME/.nvm"
 alias c="clear"
 alias ll="ls -alh"
 alias l="exa --long -L 1 -a -T --git-ignore --git --icons"
+alias wktx="create_tmux_windows_for_worktrees"
 
 alias configure="nvim ~/.zshrc"
 alias refresh="source ~/.zshrc"
@@ -34,7 +35,8 @@ alias gpl="git pull"
 alias gp="git push"
 alias gr="git rebase"
 alias gtr="git tree"
-alias gl="git log"
+alias gb="git-branch-worktree"
+# alias gwp="git-pull-worktrees"
 
 alias dot="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
 
@@ -96,40 +98,6 @@ function tmns() {
 ## tmux end
 
 ## utility
-### format git files with prettier
-function pfmt() {
-  local option="$1"
-  local branch="$2"
-  local files
-
-  files=$(git diff HEAD~1 --name-only)
-
-  if [[ "$option" == "-b" ]]; then
-      if [[ -z "$branch" ]]; then
-          echo "branch missing after option -b."
-      fi
-      if ! git rev-parse --verify "$branch" > /dev/null 2>&1; then
-          echo "Branch '$branch' does not exist."
-          return 1
-      fi
-
-      files=$(git diff $branch --name-only)
-  fi
-
-  if [[ "$option" == "-u" ]]; then
-    files+=($(git ls-files --others --exclude-standard))
-  fi
-
-  if [[ -z "$files" ]]; then
-    echo "Aucun fichier modifié trouvé."
-    return 1
-  fi
-
-  echo "Formatting files..."
-  echo "$files" | xargs npx prettier --write
-  echo "Done!"
-}
-
 ### make dir and jump into it
 function mkcd() {
     mkdir -p ${1}
@@ -181,12 +149,13 @@ function pfmt() {
 # git adog with max count
 function gadog() {
     local count="$1"
-    local cmd="git log --all --decorate --oneline --graph "
+    local cmd="git adog"
 
     if [[ "$count" ]]; then
         cmd+=" --max-count $count"
     fi
-    eval "$cmd"
+
+    tmux neww "zsh -c \"$cmd\"; zsh"
 }
 
 # gif modified files
@@ -297,11 +266,62 @@ gpsu() {
   git push --set-upstream origin "$current_branch"
 }
 
-## mouse events issue
-fix_mouse() {
-    echo -e "\e[?1003h"
-    echo -e "\e[?1003l"
+# Fonction pour créer des fenêtres tmux pour chaque worktree dans le répertoire courant
+create_tmux_windows_for_worktrees() {
+    local worktrees_dir=$(pwd)
+
+    # Vérifier si le dossier des worktrees existe
+    if [ -d "$worktrees_dir" ]; then
+        cd "$worktrees_dir" || return
+
+        # Liste des worktrees dans le dossier
+        local worktrees=$(git worktree list --porcelain | grep -E '^worktree' | cut -d " " -f 2)
+
+        # Créer une fenêtre tmux pour chaque worktree
+        for worktree in $worktrees; do
+            local window_name=$(basename "$worktree")
+            echo $worktree
+            tmux new-window -n "$window_name" -d -c "$worktree"
+        done
+    else
+        echo "Le dossier des worktrees n'existe pas : $worktrees_dir"
+    fi
 }
+
+function git-branch-worktree() {
+    if [ $# -ne 2 ]; then
+        echo "Usage: git-branch-worktree <nom_worktree> <nom_branche>"
+        return 1
+    fi
+
+    local new_worktree="$1"
+    local new_branch="$2"
+
+    git branch "$new_branch" || return 1
+
+    git worktree add "../$new_worktree" "$new_branch" || return 1
+
+    # tmux new-window -n "$new_worktree" -c "../$new-worktree" || return 1
+}
+
+# function git-pull-worktrees() {
+# # Récupérer le répertoire courant
+#     current_dir=$(pwd)
+#
+#     # Vérifier si le répertoire courant est un worktree
+#     is_worktree=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+#
+#     # Si c'est un worktree, remonter d'un niveau
+#     if [ "$is_worktree" = "true" ]; then
+#         current_dir=$(dirname "$current_dir")
+#     fi
+#
+#     # Parcourir chaque argument passé à la fonction
+#     for branch_name in "$@"; do
+#         # Utiliser git pour mettre à jour tous les worktrees avec la branche spécifiée
+#         git worktree list --porcelain | grep -e "^worktree " | cut -d " " -f 2 | xargs -I {} sh -c "cd {} && git pull && cd $current_dir"
+#     done
+# }
 
 ## utility end
 

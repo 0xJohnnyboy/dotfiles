@@ -8,12 +8,12 @@ vim.opt.encoding = "UTF-8"
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 vim.opt.expandtab = true
-vim.wo.scrolloff = 20
+vim.opt.scrolloff = 20
 local km = vim.keymap
 
 -- LAZY
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
     vim.fn.system({
         "git",
         "clone",
@@ -31,6 +31,7 @@ require("lazy").setup({
     'numToStr/Comment.nvim',
     'Sonicfury/scretch.nvim',
     'm4xshen/smartcolumn.nvim',
+    'APZelos/blamer.nvim',
     'mbbill/undotree',
     { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
 
@@ -75,6 +76,18 @@ require("lazy").setup({
             'natecraddock/telescope-zf-native.nvim'
 
         },
+    },
+
+    -- Neogit
+    {
+        "NeogitOrg/neogit",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "sindrets/diffview.nvim",
+
+            "nvim-telescope/telescope.nvim",
+        },
+        config = true
     },
 
     -- LSP
@@ -266,7 +279,6 @@ local leader_normal_mappings = {
     },
     ["\\"] = "Remove highlighting after search",
     ["rm"] = "Remove whitelines",
-    ["mp"] = "Markdown preview with glow",
 }
 -- <LEADER> VISUAL MODE
 local leader_visual_opts = {
@@ -393,7 +405,7 @@ local lsp = require('lsp-zero').preset({
 })
 require('mason').setup({})
 require('mason-lspconfig').setup({
-    ensure_installed = { 'tsserver', 'eslint', 'lua_ls' },
+    ensure_installed = { 'lua_ls' },
     handlers = {
         lsp.default_setup,
         lua_ls = function()
@@ -404,11 +416,6 @@ require('mason-lspconfig').setup({
 })
 
 local cmp = require('cmp')
-local cmp_action = require('lsp-zero').cmp_action()
-local cmp_format = require('lsp-zero').cmp_format()
-cmp.setup({
-    formatting = cmp_format,
-})
 
 lsp.on_attach(function(client, bufnr)
     lsp.default_keymaps({ buffer = bufnr })
@@ -485,30 +492,41 @@ telescope.load_extension("notify")
 vim.g['fern#renderer'] = 'nerdfont'
 
 -- Ajoute cette fonction à ton init.lua
-function close_nvim_if_last_fern_buffer()
-    -- Vérifie si le seul buffer ouvert a un filetype "fern"
-    local num_windows = vim.fn.winnr('$') - 1
-    print(num_windows)
-
-    if num_windows == 1 and vim.api.nvim_buf_get_option(0, 'filetype') == 'fern' then
-        vim.cmd('qall!')
-    end
-end
+-- function close_nvim_if_last_fern_buffer()
+--     -- Vérifie si le seul buffer ouvert a un filetype "fern"
+--     local num_windows = vim.fn.winnr('$') - 1
+--     print(num_windows)
+--
+--     if num_windows == 1 and vim.api.nvim_buf_get_option(0, 'filetype') == 'fern' then
+--         vim.cmd('qall!')
+--     end
+-- end
 
 -- Ajoute cette autocmd pour appeler la fonction avant de quitter Neovim
-vim.api.nvim_exec(
-[[
-augroup CloseNvimIfLastFernBuffer
-    autocmd!
-    autocmd WinClosed,WinClosed,VimLeavePre lua close_nvim_if_last_fern_buffer()
-augroup END
-]],
-false)
+-- vim.api.nvim_exec(
+-- [[
+-- augroup CloseNvimIfLastFernBuffer
+--     autocmd!
+--     autocmd WinClosed,WinClosed,VimLeavePre lua close_nvim_if_last_fern_buffer()
+-- augroup END
+-- ]],
+-- false)
 
+-- Difftastic
+function DiffWithDifftastic()
+    local current_buffer = vim.fn.expand('%')
+    local other_buffer = vim.fn.input('Diff with: ')
+
+    vim.cmd('split')
+    vim.cmd('term difft ' .. current_buffer .. ' ' .. other_buffer)
+    vim.cmd('resize 10')
+    vim.cmd('startinsert')
+end
 
 -- Remaps
 -- edition
 km.set("n", "<leader>rw", ":g/^$/d<CR>")
+km.set("n", "<leader>df", "<cmd>lua DiffWithDifftastic()<CR>", { noremap = true, silent = true })
 -- search
 km.set("n", "<leader>\\", ":noh<CR>")
 -- buffers
@@ -537,10 +555,13 @@ km.set("n", "<leader>wj", "<C-w>j")
 km.set("n", "<leader>wk", "<C-w>k")
 km.set("n", "<leader>wh", "<C-w>h")
 km.set("n", "<leader>wl", "<C-w>l")
-km.set("n", "<leader>mp", ":rightbelow vsplit | terminal glow %<CR>")
+-- marks
+km.set("n", "<leader>md", ":delm!<CR>")
 -- Telescope
 km.set('n', '<leader>ff', builtin.find_files, {})
-km.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>ft", ":TodoTelescope<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>fm", ":Telescope marks<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>fml", ":Telescope marks mark_type=local<cr>", { silent = true, noremap = true })
 km.set('n', '<leader>bl', builtin.buffers, {})
 km.set('n', '<leader>pf', builtin.git_files, {})
 km.set('n', '<leader>fo', builtin.oldfiles, {})
@@ -553,6 +574,9 @@ km.set("n", "<leader>pV", live_grep_args_shortcuts.grep_visual_selection)
 km.set("n", "<leader>nc", notify.dismiss, {})
 km.set("n", "<leader>nl", function() noice.cmd("last") end)
 km.set("n", "<leader>nh", function() noice.cmd("history") end)
+-- Neogit
+km.set("n", "<leader>g", "<cmd>Neogit<CR>", { silent = true, noremap = true })
+km.set("n", "<leader>gc", "<cmd>Neogit commit<CR>", { silent = true, noremap = true })
 -- fern
 km.set("n", "<leader>ee", ":Fern . -drawer -width=60 -toggle -right<CR>", { silent = true, noremap = true })
 km.set("n", "<leader>es", ":Fern . -reveal=% -drawer -width=60 -toggle -right<CR>", { silent = true, noremap = true })

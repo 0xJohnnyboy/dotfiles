@@ -1,0 +1,57 @@
+#!/bin/bash
+
+source $HOME/.config/sketchybar/vars.sh
+
+# sketchybar --animate tanh 6\
+#                 --set $NAME\
+#                  icon.highlight=$SELECTED\
+#                  background.drawing=$SELECTED
+#
+# if [[ $SELECTED == true ]]; then
+#   sketchybar --set space_name_$DID\
+#                    icon.drawing=off\
+#                    icon.color=$LIGHT_COLOR\
+#                    label=$NAME\
+#                    label.color=$MAIN_COLOR\
+#                    label.padding_left=24\
+#                    label.padding_right=24\
+#                    background.padding_right=16\
+#                    background.padding_left=16\
+#                    background.color=$ACCENT_COLOR\
+#                    associated_display=$DID
+# fi
+#
+#!/bin/bash
+
+sketchybar --add event aerospace_workspace_change
+
+for sid in $(aerospace list-workspaces --all); do
+    sketchybar --add item space.$sid left \
+        --subscribe space.$sid aerospace_workspace_change          \
+        --set space.$sid background.color=0x44ffffff               \
+                         background.corner_radius=5                \
+                         background.height=20                      \
+                         background.drawing=off                    \
+                         label.drawing=off                         \
+                         icon="$sid"                               \
+                         click_script="aerospace workspace $sid"   \
+                         script="$CONFIG_DIR/plugins/space.sh $sid"
+done
+
+
+##### Adding Left Items #####
+# We add some regular items to the left side of the bar
+# only the properties deviating from the current defaults need to be set
+
+sketchybar --add item space_separator left                         \
+           --set space_separator icon=                            \
+                                 padding_left=10                   \
+                                 padding_right=10                  \
+                                 label.drawing=off
+
+
+if [ "$1" = "$FOCUSED_WORKSPACE" ]; then
+    sketchybar --set $NAME background.drawing=on
+else
+    sketchybar --set $NAME background.drawing=off
+fi

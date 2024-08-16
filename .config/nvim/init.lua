@@ -39,3 +39,4 @@ vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 vim.diagnostic.config({
     virtual_lines = true
 })
+

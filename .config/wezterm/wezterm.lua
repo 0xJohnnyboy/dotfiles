@@ -4,6 +4,14 @@ local wezterm = require 'wezterm'
 -- config table
 local config = {}
 
+config.keys = {
+    {
+        key = ' ',
+        mods = 'LEADER|CTRL',
+        action = wezterm.action.SendKey { key = ' ', mods = 'CTRL' },
+    }
+}
+
 -- config builder for error handling
 if wezterm.config_builder then
   config = wezterm.config_builder()

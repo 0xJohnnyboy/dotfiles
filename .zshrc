@@ -90,7 +90,7 @@ alias gtr="git tree"
 alias gl="git log"
 
 # Dotfiles management
-alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
+alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles.git --work-tree=$HOME"
 
 # Docker
 if command -v docker &> /dev/null; then

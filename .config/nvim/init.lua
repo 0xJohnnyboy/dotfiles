@@ -29,7 +29,7 @@ require("lazy").setup({
     { "ellisonleao/gruvbox.nvim",        priority = 1000,    config = true, opts = ... },
     'nvim-lualine/lualine.nvim',
     'numToStr/Comment.nvim',
-    'Sonicfury/scretch.nvim',
+    '0xJohnnyboy/scretch.nvim',
     'm4xshen/smartcolumn.nvim',
     'mbbill/undotree',
     { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
@@ -77,6 +77,16 @@ require("lazy").setup({
         },
     },
 
+    -- Grug-Far
+    {
+        'MagicDuck/grug-far.nvim',
+        config = function()
+            require('grug-far').setup({
+            });
+        end
+    },
+
+
     -- LSP
     { 'williamboman/mason.nvim' },
     { 'williamboman/mason-lspconfig.nvim' },
@@ -84,12 +94,38 @@ require("lazy").setup({
     { 'neovim/nvim-lspconfig' },
     { 'hrsh7th/cmp-nvim-lsp' },
     { 'hrsh7th/nvim-cmp' },
-    { 'L3MON4D3/LuaSnip' },
+    { 'L3MON4D3/LuaSnip',                 build = "make install_jsregexp" },
 
     -- Tim Pope
     'tpope/vim-surround',
     'tpope/vim-eunuch',
     'tpope/vim-speeddating',
+
+    -- Supermaven
+    {
+        "supermaven-inc/supermaven-nvim",
+        config = function()
+            require("supermaven-nvim").setup({})
+        end,
+    },
+
+    -- Neogit
+    {
+        "NeogitOrg/neogit",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "sindrets/diffview.nvim",
+            "nvim-telescope/telescope.nvim",
+        },
+        config = true
+    },
+
+    {
+        'MeanderingProgrammer/markdown.nvim',
+        main = "render-markdown",
+        opts = {},
+        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    },
 
     -- Folke
     {
@@ -120,7 +156,8 @@ require("lazy").setup({
 
 -- theme
 -- Gruvbox initialization
-vim.o.background = 'dark'
+-- vim.o.background = 'dark'
+vim.o.background = 'light'
 vim.cmd([[colorscheme gruvbox]])
 
 -- Transparent background because wezterm is already setup with transparency
@@ -171,102 +208,84 @@ notify.setup({
 })
 
 local wk = require("which-key")
+wk.setup({
+    ignore_missing = true
+})
+
 local leader_normal_opts = {
     prefix = "<leader>",
     mode = "n",
     silent = true,
 }
 local leader_normal_mappings = {
-    w = {
-        name = "Window",
-        s = "Split horizontally",
-        ["sj"] = "Split horizontally and focus down",
-        v = "Split vertically",
-        ["vl"] = "Split vertically and focus right",
-        w = "New buffer in new pane",
-        c = "Close pane",
-        h = "Focus left",
-        j = "Focus down",
-        k = "Focus up",
-        l = "Focus right",
-    },
-    t = {
-        name = "Tabs",
-        t = "New",
-        c = "Close",
-        n = "Next",
-        p = "Prev",
-    },
-    s = {
-        name = "Scretch.nvim",
-        n = "New scretch",
-        ["nn"] = "New named scretch",
-        l = "Toggle last scretch",
-        s = "Search scretches",
-        g = "Live grep scretches",
-        v = "Explore scretches",
-    },
-    x = {
-        name = "Trouble",
-        x = "Toggle Trouble",
-        w = "Trouble workspace diagnostics",
-        d = "Trouble document diagnostics",
-        l = "Trouble loclist",
-        q = "Trouble quickfix",
-        R = "Trouble LSP references"
-    },
-    b = {
-        name = "buffer",
-        n = "Next buffer",
-        p = "Previous buffer",
-        d = "Close buffer",
-        l = "List buffers",
-        r = "Refresh buffers (redraw)",
-        x = "Close all buffers but the current one",
-    },
-    c = {
-        name = "Comment",
-        l = "Toggle line comment",
-        b = "Toggle block comment",
-        O = "Insert comment on the line above",
-        o = "Insert comment on the line below",
-        A = "Insert comment at the end of the line",
-    },
-    p = {
-        name = "Project",
-        t = "Telescope explorer",
-        f = "Search project files (git)",
-        g = "Project git status",
-        s = "Live grep",
-    },
-    e = {
-        name = "NvimTree",
-        e = "Toggle",
-        f = "Focus",
-        s = "Show file in tree",
-    },
-    f = {
-        name = "Find",
-        o = "Find old file",
-        f = "Fuzze find file"
-    },
-    D = {
-        name = "Database",
-        u = "Toggle UI",
-        f = "Find buffer",
-        r = "Rename buffer",
-        q = "Last query info",
-    },
-    u = "Toggle undotree",
-    l = {
-        name = "LSP",
-        a = "Code action",
-        f = "Format",
-        o = "Open diagnostics float window",
-    },
-    ["\\"] = "Remove highlighting after search",
-    ["rm"] = "Remove whitelines",
-    ["mp"] = "Markdown preview with glow",
+    { "<leader>D",   group = "Database" },
+    { "<leader>Df",  desc = "Find buffer" },
+    { "<leader>Dq",  desc = "Last query info" },
+    { "<leader>Dr",  desc = "Rename buffer" },
+    { "<leader>Du",  desc = "Toggle UI" },
+    { "<leader>\\",  desc = "Remove highlighting after search" },
+    { "<leader>b",   group = "buffer" },
+    { "<leader>bd",  desc = "Close buffer" },
+    { "<leader>bl",  desc = "List buffers" },
+    { "<leader>bn",  desc = "Next buffer" },
+    { "<leader>bp",  desc = "Previous buffer" },
+    { "<leader>br",  desc = "Refresh buffers (redraw)" },
+    { "<leader>bx",  desc = "Close all buffers but the current one" },
+    { "<leader>c",   group = "Comment" },
+    { "<leader>cA",  desc = "Insert comment at the end of the line" },
+    { "<leader>cO",  desc = "Insert comment on the line above" },
+    { "<leader>cb",  desc = "Toggle block comment" },
+    { "<leader>cl",  desc = "Toggle line comment" },
+    { "<leader>co",  desc = "Insert comment on the line below" },
+    { "<leader>e",   group = "NvimTree" },
+    { "<leader>ee",  desc = "Toggle" },
+    { "<leader>ef",  desc = "Focus" },
+    { "<leader>es",  desc = "Show file in tree" },
+    { "<leader>f",   group = "Find" },
+    { "<leader>ff",  desc = "Fuzze find file" },
+    { "<leader>fo",  desc = "Find old file" },
+    { "<leader>l",   group = "LSP" },
+    { "<leader>la",  desc = "Code action" },
+    { "<leader>lf",  desc = "Format" },
+    { "<leader>lo",  desc = "Open diagnostics float window" },
+    { "<leader>mp",  desc = "Markdown preview with glow" },
+    { "<leader>p",   group = "Project" },
+    { "<leader>pf",  desc = "Search project files (git)" },
+    { "<leader>pg",  desc = "Project git status" },
+    { "<leader>ps",  desc = "Live grep" },
+    { "<leader>pt",  desc = "Telescope explorer" },
+    { "<leader>rm",  desc = "Remove whitelines" },
+    { "<leader>s",   group = "Scretch.nvim" },
+    { "<leader>sg",  desc = "Live grep scretches" },
+    { "<leader>sl",  desc = "Toggle last scretch" },
+    { "<leader>sn",  desc = "New scretch" },
+    { "<leader>snn", desc = "New named scretch" },
+    { "<leader>ss",  desc = "Search scretches" },
+    { "<leader>sv",  desc = "Explore scretches" },
+    { "<leader>t",   group = "Tabs" },
+    { "<leader>tc",  desc = "Close" },
+    { "<leader>tn",  desc = "Next" },
+    { "<leader>tp",  desc = "Prev" },
+    { "<leader>tt",  desc = "New" },
+    { "<leader>u",   desc = "Toggle undotree" },
+    { "<leader>w",   group = "Window" },
+    { "<leader>wc",  desc = "Close pane" },
+    { "<leader>wh",  desc = "Focus left" },
+    { "<leader>wj",  desc = "Focus down" },
+    { "<leader>wk",  desc = "Focus up" },
+    { "<leader>wl",  desc = "Focus right" },
+    { "<leader>ws",  desc = "Split horizontally" },
+    { "<leader>wsj", desc = "Split horizontally and focus down" },
+    { "<leader>wv",  desc = "Split vertically" },
+    { "<leader>wvl", desc = "Split vertically and focus right" },
+    { "<leader>ww",  desc = "New buffer in new pane" },
+    { "<leader>x",   group = "Trouble" },
+    { "<leader>xR",  desc = "Trouble LSP references" },
+    { "<leader>xd",  desc = "Trouble document diagnostics" },
+    { "<leader>xl",  desc = "Trouble loclist" },
+    { "<leader>xq",  desc = "Trouble quickfix" },
+    { "<leader>xw",  desc = "Trouble workspace diagnostics" },
+    { "<leader>xx",  desc = "Toggle Trouble" },
 }
 -- <LEADER> VISUAL MODE
 local leader_visual_opts = {
@@ -275,38 +294,36 @@ local leader_visual_opts = {
     silent = true,
 }
 local leader_visual_mappings = {
-    c = {
-        name = "Comment",
-        l = "Toggle line comment",
-        b = "Toggle block comment",
+    {
+        mode = { "v" },
+        { "<leader>c",  group = "Comment" },
+        { "<leader>cb", desc = "Toggle block comment" },
+        { "<leader>cl", desc = "Toggle line comment" },
+        { "<leader>pV", desc = "Live grep visual selection" },
     },
-    ["pV"] = "Live grep visual selection",
 }
+
 -- NORMAL MODE
 local normal_opts = {
     mode = "n",
     silent = true
 }
 local normal_mappings = {
-    ["[d"] = "Go to next diagnostic",
-    ["]d"] = "Go to previous diagnostic",
-    z = {
-        name = "Folds",
-        ["}"] = "Toggle } fold",
-        ["{"] = "Toggle { fold",
-        [")"] = "Toggle ) fold",
-        ["("] = "Toggle ( fold",
-        ["]"] = "Toggle ] fold",
-        ["["] = "Toggle [ fold",
-        ["T"] = "Toggle tag fold",
-    },
-    g = {
-        d = "Go to definition",
-        D = "Go to declaration",
-        I = "Go to implementation",
-        o = "Go to type definition",
-        r = "Go to type references",
-    }
+    { "[d", desc = "Go to next diagnostic" },
+    { "]d", desc = "Go to previous diagnostic" },
+    { "gD", desc = "Go to declaration" },
+    { "gI", desc = "Go to implementation" },
+    { "gd", desc = "Go to definition" },
+    { "go", desc = "Go to type definition" },
+    { "gr", desc = "Go to type references" },
+    { "z",  group = "Folds" },
+    { "z(", desc = "Toggle ( fold" },
+    { "z)", desc = "Toggle ) fold" },
+    { "zT", desc = "Toggle tag fold" },
+    { "z[", desc = "Toggle [ fold" },
+    { "z]", desc = "Toggle ] fold" },
+    { "z{", desc = "Toggle { fold" },
+    { "z}", desc = "Toggle } fold" },
 }
 
 -- INSERT MODE
@@ -387,11 +404,30 @@ require("trouble").setup {
 local scretch = require("scretch")
 scretch.setup()
 
+-- supermaven
+require("supermaven-nvim").setup({
+  keymaps = {
+    accept_suggestion = "<Tab>",
+    clear_suggestion = "<C-]>",
+    accept_word = "<C-j>",
+  },
+  -- ignore_filetypes = { cpp = true },
+  -- color = {
+  --   suggestion_color = "#ffffff",
+  --   cterm = 244,
+  -- },
+  log_level = "info", -- set to "off" to disable logging completely
+  disable_inline_completion = false, -- disables inline completion for use with cmp
+  disable_keymaps = false -- disables built in keymaps for more manual control
+})
+
 -- lsp
 local lsp = require('lsp-zero').preset({
     suggest_lsp_servers = true,
 })
-require('mason').setup({})
+require('mason').setup({
+    log_level = vim.log.levels.DEBUG
+})
 require('mason-lspconfig').setup({
     ensure_installed = { 'tsserver', 'eslint', 'lua_ls' },
     handlers = {
@@ -408,6 +444,9 @@ local cmp_action = require('lsp-zero').cmp_action()
 local cmp_format = require('lsp-zero').cmp_format()
 cmp.setup({
     formatting = cmp_format,
+    sources = {
+        { name = "supermaven" },
+    }
 })
 
 lsp.on_attach(function(client, bufnr)
@@ -497,13 +536,13 @@ end
 
 -- Ajoute cette autocmd pour appeler la fonction avant de quitter Neovim
 vim.api.nvim_exec(
-[[
+    [[
 augroup CloseNvimIfLastFernBuffer
     autocmd!
     autocmd WinClosed,WinClosed,VimLeavePre lua close_nvim_if_last_fern_buffer()
 augroup END
 ]],
-false)
+    false)
 
 
 -- Remaps
@@ -557,13 +596,12 @@ km.set("n", "<leader>nh", function() noice.cmd("history") end)
 km.set("n", "<leader>ee", ":Fern . -drawer -width=60 -toggle -right<CR>", { silent = true, noremap = true })
 km.set("n", "<leader>es", ":Fern . -reveal=% -drawer -width=60 -toggle -right<CR>", { silent = true, noremap = true })
 -- Trouble
-km.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xl", "<cmd>TroubleToggle loclist<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xR", "<cmd>TroubleToggle lsp_references<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xt", "<cmd>TodoTrouble<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>xl", "<cmd>Trouble loclist toggle<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>xR", "<cmd>Trouble lsp toggle<cr>", { silent = true, noremap = true })
+km.set("n", "<leader>xt", "<cmd>Trouble todo toggle<cr>", { silent = true, noremap = true })
 -- Scretch
 km.set('n', '<leader>sn', scretch.new)
 km.set('n', '<leader>snn', scretch.new_named)
@@ -574,6 +612,9 @@ km.set('n', '<leader>ss', scretch.search)
 km.set('n', '<leader>st', scretch.edit_template)
 km.set('n', '<leader>sg', scretch.grep)
 km.set('n', '<leader>sv', scretch.explore)
+-- Grugfar
+km.set('n', '<leader>Gf', ':lua require("grug-far").grug_far({ prefills = { flags = vim.fn.expand("%") } })<cr>',
+    { noremap = true, silent = true })
 -- undotree
 km.set('n', '<leader>u', vim.cmd.UndotreeToggle)
 -- folds

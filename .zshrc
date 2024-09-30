@@ -37,7 +37,7 @@ alias gr="git rebase"
 alias gtr="git tree"
 alias gl="git log"
 
-alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME" 
+alias dotfiles="/usr/bin/git --git-dir=$HOME/dotfiles.git --work-tree=$HOME" 
 
 # docker aliases
 if [[ -z docker ]]; then
@@ -246,3 +246,8 @@ if [ -f '/Users/johnnyboy/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# rust
+source $HOME/.cargo/env
+# zig
+export PATH="$HOME/zig-linux-x86_64-0.14.0-dev.43+96501d338:$PATH"

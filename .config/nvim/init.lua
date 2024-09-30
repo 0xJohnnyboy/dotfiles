@@ -1,5 +1,5 @@
--- basics
 vim.g.mapleader = " "
+vim.g.maplocalleader = ","
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 vim.opt.termguicolors = true
@@ -26,13 +26,13 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-    { "ellisonleao/gruvbox.nvim",        priority = 1000,    config = true, opts = ... },
-    'nvim-lualine/lualine.nvim',
-    'numToStr/Comment.nvim',
+    { "ellisonleao/gruvbox.nvim",  priority = 1000,                                   config = true, opts = ... },
+    { 'nvim-lualine/lualine.nvim', config = function() require('plugins.lualine') end },
+    { 'numToStr/Comment.nvim',     config = function() require('plugins.comment') end },
     '0xJohnnyboy/scretch.nvim',
-    'm4xshen/smartcolumn.nvim',
+    { 'm4xshen/smartcolumn.nvim',        config = function() require('plugins.smartcolumn') end },
     'mbbill/undotree',
-    { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
+    { 'nvim-treesitter/nvim-treesitter', config = function() require('plugins.treesitter') end, build = ':TSUpdate' },
 
     -- Fern
     {
@@ -75,6 +75,7 @@ require("lazy").setup({
             'natecraddock/telescope-zf-native.nvim'
 
         },
+        config = function() require('plugins.telescope') end,
     },
 
     -- Grug-Far
@@ -124,13 +125,14 @@ require("lazy").setup({
         'MeanderingProgrammer/markdown.nvim',
         main = "render-markdown",
         opts = {},
-        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
     },
 
     -- Folke
     {
         "folke/which-key.nvim",
         event = "VeryLazy",
+        config = function() require('plugins.which-key') end,
         init = function()
             vim.o.timeout = true
             vim.o.timeoutlen = 300
@@ -142,15 +144,16 @@ require("lazy").setup({
         opts = {
         }
     },
-    { 'folke/trouble.nvim', dependencies = { "nvim-tree/nvim-web-devicons" } },
+    { 'folke/trouble.nvim', config = function() require('trouble').setup({}) end, dependencies = { "nvim-tree/nvim-web-devicons" } },
     {
         "folke/noice.nvim",
+        config = function() require('plugins.noice') end,
         event = "VeryLazy",
         opts = {
         },
         dependencies = {
             "MunifTanjim/nui.nvim",
-            "rcarriga/nvim-notify",
+            { "rcarriga/nvim-notify", config = function() require('plugins.notify') end },
         }
     } })
 
@@ -163,263 +166,6 @@ vim.cmd([[colorscheme gruvbox]])
 -- Transparent background because wezterm is already setup with transparency
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-
--- comment
-require("Comment").setup({
-    toggler = {
-        line = '<leader>cl',
-        block = '<leader>cb',
-    },
-    opleader = {
-        line = '<leader>cl',
-        block = '<leader>cb',
-    },
-    extra = {
-        above = '<leader>cO',
-        below = '<leader>co',
-        eol = '<leader>cA',
-    },
-})
-
--- lualine
-require('lualine').setup({
-    options = { theme = 'gruvbox' }
-})
-
--- notify
-local notify = require("notify")
-
-notify.setup({
-    background_colour = "#000000",
-    fps = 30,
-    icons = {
-        DEBUG = "",
-        ERROR = "",
-        INFO = "",
-        TRACE = "✎",
-        WARN = ""
-    },
-    level = 2,
-    minimum_width = 50,
-    render = "default",
-    stages = "fade_in_slide_out",
-    timeout = 3000,
-    top_down = true
-})
-
-local wk = require("which-key")
-wk.setup({
-    ignore_missing = true
-})
-
-local leader_normal_opts = {
-    prefix = "<leader>",
-    mode = "n",
-    silent = true,
-}
-local leader_normal_mappings = {
-    { "<leader>D",   group = "Database" },
-    { "<leader>Df",  desc = "Find buffer" },
-    { "<leader>Dq",  desc = "Last query info" },
-    { "<leader>Dr",  desc = "Rename buffer" },
-    { "<leader>Du",  desc = "Toggle UI" },
-    { "<leader>\\",  desc = "Remove highlighting after search" },
-    { "<leader>b",   group = "buffer" },
-    { "<leader>bd",  desc = "Close buffer" },
-    { "<leader>bl",  desc = "List buffers" },
-    { "<leader>bn",  desc = "Next buffer" },
-    { "<leader>bp",  desc = "Previous buffer" },
-    { "<leader>br",  desc = "Refresh buffers (redraw)" },
-    { "<leader>bx",  desc = "Close all buffers but the current one" },
-    { "<leader>c",   group = "Comment" },
-    { "<leader>cA",  desc = "Insert comment at the end of the line" },
-    { "<leader>cO",  desc = "Insert comment on the line above" },
-    { "<leader>cb",  desc = "Toggle block comment" },
-    { "<leader>cl",  desc = "Toggle line comment" },
-    { "<leader>co",  desc = "Insert comment on the line below" },
-    { "<leader>e",   group = "NvimTree" },
-    { "<leader>ee",  desc = "Toggle" },
-    { "<leader>ef",  desc = "Focus" },
-    { "<leader>es",  desc = "Show file in tree" },
-    { "<leader>f",   group = "Find" },
-    { "<leader>ff",  desc = "Fuzze find file" },
-    { "<leader>fo",  desc = "Find old file" },
-    { "<leader>l",   group = "LSP" },
-    { "<leader>la",  desc = "Code action" },
-    { "<leader>lf",  desc = "Format" },
-    { "<leader>lo",  desc = "Open diagnostics float window" },
-    { "<leader>mp",  desc = "Markdown preview with glow" },
-    { "<leader>p",   group = "Project" },
-    { "<leader>pf",  desc = "Search project files (git)" },
-    { "<leader>pg",  desc = "Project git status" },
-    { "<leader>ps",  desc = "Live grep" },
-    { "<leader>pt",  desc = "Telescope explorer" },
-    { "<leader>rm",  desc = "Remove whitelines" },
-    { "<leader>s",   group = "Scretch.nvim" },
-    { "<leader>sg",  desc = "Live grep scretches" },
-    { "<leader>sl",  desc = "Toggle last scretch" },
-    { "<leader>sn",  desc = "New scretch" },
-    { "<leader>snn", desc = "New named scretch" },
-    { "<leader>ss",  desc = "Search scretches" },
-    { "<leader>sv",  desc = "Explore scretches" },
-    { "<leader>t",   group = "Tabs" },
-    { "<leader>tc",  desc = "Close" },
-    { "<leader>tn",  desc = "Next" },
-    { "<leader>tp",  desc = "Prev" },
-    { "<leader>tt",  desc = "New" },
-    { "<leader>u",   desc = "Toggle undotree" },
-    { "<leader>w",   group = "Window" },
-    { "<leader>wc",  desc = "Close pane" },
-    { "<leader>wh",  desc = "Focus left" },
-    { "<leader>wj",  desc = "Focus down" },
-    { "<leader>wk",  desc = "Focus up" },
-    { "<leader>wl",  desc = "Focus right" },
-    { "<leader>ws",  desc = "Split horizontally" },
-    { "<leader>wsj", desc = "Split horizontally and focus down" },
-    { "<leader>wv",  desc = "Split vertically" },
-    { "<leader>wvl", desc = "Split vertically and focus right" },
-    { "<leader>ww",  desc = "New buffer in new pane" },
-    { "<leader>x",   group = "Trouble" },
-    { "<leader>xR",  desc = "Trouble LSP references" },
-    { "<leader>xd",  desc = "Trouble document diagnostics" },
-    { "<leader>xl",  desc = "Trouble loclist" },
-    { "<leader>xq",  desc = "Trouble quickfix" },
-    { "<leader>xw",  desc = "Trouble workspace diagnostics" },
-    { "<leader>xx",  desc = "Toggle Trouble" },
-}
--- <LEADER> VISUAL MODE
-local leader_visual_opts = {
-    prefix = "<leader>",
-    mode = "v",
-    silent = true,
-}
-local leader_visual_mappings = {
-    {
-        mode = { "v" },
-        { "<leader>c",  group = "Comment" },
-        { "<leader>cb", desc = "Toggle block comment" },
-        { "<leader>cl", desc = "Toggle line comment" },
-        { "<leader>pV", desc = "Live grep visual selection" },
-    },
-}
-
--- NORMAL MODE
-local normal_opts = {
-    mode = "n",
-    silent = true
-}
-local normal_mappings = {
-    { "[d", desc = "Go to next diagnostic" },
-    { "]d", desc = "Go to previous diagnostic" },
-    { "gD", desc = "Go to declaration" },
-    { "gI", desc = "Go to implementation" },
-    { "gd", desc = "Go to definition" },
-    { "go", desc = "Go to type definition" },
-    { "gr", desc = "Go to type references" },
-    { "z",  group = "Folds" },
-    { "z(", desc = "Toggle ( fold" },
-    { "z)", desc = "Toggle ) fold" },
-    { "zT", desc = "Toggle tag fold" },
-    { "z[", desc = "Toggle [ fold" },
-    { "z]", desc = "Toggle ] fold" },
-    { "z{", desc = "Toggle { fold" },
-    { "z}", desc = "Toggle } fold" },
-}
-
--- INSERT MODE
-local insert_opts = {
-    mode = "i",
-    silent = true
-}
-local insert_mappings = {
-}
-wk.register(leader_normal_mappings, leader_normal_opts)
-wk.register(leader_visual_mappings, leader_visual_opts)
-wk.register(normal_mappings, normal_opts)
-wk.register(insert_mappings, insert_opts)
-
--- Treesitter
-require 'nvim-treesitter.configs'.setup {
-    ensure_installed = { "lua", "vim", "vimdoc", "query", "rust", "typescript", "javascript", "html", "css" },
-    sync_install = false,
-    auto_install = true,
-    highlight = {
-        enable = true,
-    },
-    textobjects = {
-        select = {
-            enable = true,
-            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-            keymaps = {
-                -- You can use the capture groups defined in textobjects.scm
-                ['aa'] = '@parameter.outer',
-                ['ia'] = '@parameter.inner',
-                ['af'] = '@function.outer',
-                ['if'] = '@function.inner',
-                ['ac'] = '@class.outer',
-                ['ic'] = '@class.inner',
-                ['ii'] = '@conditional.inner',
-                ['ai'] = '@conditional.outer',
-                ['il'] = '@loop.inner',
-                ['al'] = '@loop.outer',
-            },
-        },
-        move = {
-            enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
-            goto_next_start = {
-                [']f'] = '@function.outer',
-                [']]'] = '@class.outer',
-            },
-            goto_next_end = {
-                [']F'] = '@function.outer',
-                [']['] = '@class.outer',
-            },
-            goto_previous_start = {
-                ['[f'] = '@function.outer',
-                ['[['] = '@class.outer',
-            },
-            goto_previous_end = {
-                ['[F'] = '@function.outer',
-                ['[]'] = '@class.outer',
-            },
-        },
-        swap = {
-            enable = true,
-            swap_next = {
-                ['<leader>pan'] = '@parameter.inner',
-            },
-            swap_previous = {
-                ['<leader>pap'] = '@parameter.inner',
-            },
-        },
-    },
-}
-
--- trouble
-require("trouble").setup {
-}
-
--- scretch
-local scretch = require("scretch")
-scretch.setup()
-
--- supermaven
-require("supermaven-nvim").setup({
-  keymaps = {
-    accept_suggestion = "<Tab>",
-    clear_suggestion = "<C-]>",
-    accept_word = "<C-j>",
-  },
-  -- ignore_filetypes = { cpp = true },
-  -- color = {
-  --   suggestion_color = "#ffffff",
-  --   cterm = 244,
-  -- },
-  log_level = "info", -- set to "off" to disable logging completely
-  disable_inline_completion = false, -- disables inline completion for use with cmp
-  disable_keymaps = false -- disables built in keymaps for more manual control
-})
 
 -- lsp
 local lsp = require('lsp-zero').preset({
@@ -498,28 +244,6 @@ function toggle_fold(char)
     vim.cmd('normal! ' .. fold_command)
 end
 
--- smart column
-local smartcolumn_config = {
-    colorcolumn = "120",
-    disabled_filetypes = { "help", "text", "markdown", "fern" },
-    custom_colorcolumn = {},
-    scope = "line",
-}
-
-require("smartcolumn").setup(smartcolumn_config)
-
--- Telescope
-local telescope = require('telescope')
-local builtin = require('telescope.builtin')
-local live_grep_args_shortcuts = require("telescope-live-grep-args.shortcuts")
-local noice = require('noice')
-
-telescope.setup()
-telescope.load_extension("file_browser")
-telescope.load_extension("live_grep_args")
-telescope.load_extension("zf-native")
-telescope.load_extension("notify")
-
 -- Fern
 vim.g['fern#renderer'] = 'nerdfont'
 
@@ -578,6 +302,8 @@ km.set("n", "<leader>wh", "<C-w>h")
 km.set("n", "<leader>wl", "<C-w>l")
 km.set("n", "<leader>mp", ":rightbelow vsplit | terminal glow %<CR>")
 -- Telescope
+local builtin = require('telescope.builtin')
+local live_grep_args_shortcuts = require('telescope-live-grep-args.shortcuts')
 km.set('n', '<leader>ff', builtin.find_files, {})
 km.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { silent = true, noremap = true })
 km.set('n', '<leader>bl', builtin.buffers, {})
@@ -589,6 +315,8 @@ km.set('n', '<leader>pn', ':Telescope notify<CR>', {})
 km.set("n", "<leader>ps", ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>")
 km.set("n", "<leader>pV", live_grep_args_shortcuts.grep_visual_selection)
 -- notify
+local notify = require('notify')
+local noice = require('noice')
 km.set("n", "<leader>nc", notify.dismiss, {})
 km.set("n", "<leader>nl", function() noice.cmd("last") end)
 km.set("n", "<leader>nh", function() noice.cmd("history") end)
@@ -603,6 +331,7 @@ km.set("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { silent = true, nor
 km.set("n", "<leader>xR", "<cmd>Trouble lsp toggle<cr>", { silent = true, noremap = true })
 km.set("n", "<leader>xt", "<cmd>Trouble todo toggle<cr>", { silent = true, noremap = true })
 -- Scretch
+local scretch = require('scretch')
 km.set('n', '<leader>sn', scretch.new)
 km.set('n', '<leader>snn', scretch.new_named)
 km.set('n', '<leader>sft', scretch.new_from_template)
@@ -615,6 +344,8 @@ km.set('n', '<leader>sv', scretch.explore)
 -- Grugfar
 km.set('n', '<leader>Gf', ':lua require("grug-far").grug_far({ prefills = { flags = vim.fn.expand("%") } })<cr>',
     { noremap = true, silent = true })
+-- Supermaven
+km.set('n', '<leader>St', '<cmd>SupermavenToggle<cr>', { silent = true, noremap = true })
 -- undotree
 km.set('n', '<leader>u', vim.cmd.UndotreeToggle)
 -- folds

@@ -8,8 +8,14 @@ vim.opt.encoding = "UTF-8"
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 vim.opt.expandtab = true
-vim.wo.scrolloff = 20
-local km = vim.keymap
+vim.opt.showmode = false
+
+vim.api.nvim_create_autocmd({ 'BufEnter', 'WinEnter', 'WinNew' }, {
+    callback = function()
+        vim.wo.scrolloff = 10
+    end,
+    desc = 'Set scrolloff for each window'
+})
 
 -- LAZY
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -26,13 +32,98 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-    { "ellisonleao/gruvbox.nvim",  priority = 1000,                                   config = true, opts = ... },
+    dev = {
+        log = { level = "debug" }
+    },
+    { 'ellisonleao/gruvbox.nvim',  priority = 1000,                                   config = true, opts = ... },
     { 'nvim-lualine/lualine.nvim', config = function() require('plugins.lualine') end },
     { 'numToStr/Comment.nvim',     config = function() require('plugins.comment') end },
-    '0xJohnnyboy/scretch.nvim',
-    { 'm4xshen/smartcolumn.nvim',        config = function() require('plugins.smartcolumn') end },
-    'mbbill/undotree',
-    { 'nvim-treesitter/nvim-treesitter', config = function() require('plugins.treesitter') end, build = ':TSUpdate' },
+    { '0xJohnnyboy/scretch.nvim' },
+    { 'mbbill/undotree' },
+
+    -- Mason
+    {
+        'williamboman/mason.nvim',
+        config = function()
+            require('mason').setup({
+                log_level = vim.log.levels.DEBUG
+            })
+        end,
+    },
+
+    -- snacks
+    {
+        "folke/snacks.nvim",
+        priority = 1000,
+        lazy = false,
+        ---@type snacks.Config
+        opts = {
+            animate = {
+                enabled = true,
+                duration = 5, -- ms per step
+                easing = "inOutQuad",
+                fps = 60,  -- frames per second. Global setting for all animations
+            },
+            bigfile = {
+                enabled = true,
+                notify = true,
+                size = 1.5 * 1024 * 1024,
+                line_length = 1000,
+                ---@param ctx {buf: number, ft:string}
+                setup = function(ctx)
+                    if vim.fn.exists(":NoMatchParen") ~= 0 then
+                        vim.cmd([[NoMatchParen]])
+                    end
+                    Snacks.util.wo(0, { foldmethod = "manual", statuscolumn = "", conceallevel = 0 })
+                    vim.b.minianimate_disable = true
+                    vim.schedule(function()
+                        if vim.api.nvim_buf_is_valid(ctx.buf) then
+                            vim.bo[ctx.buf].syntax = ctx.ft
+                        end
+                    end)
+                end,
+            },
+            dashboard = {
+                enabled = true,
+                sections = {
+                    { section = "header" },
+                    {
+                        pane = 2,
+                        section = "terminal",
+                        -- cmd = "colorscript -e square",
+                        cmd = "",
+                        height = 5,
+                        padding = 1,
+                    },
+                    { section = "keys", gap = 1, padding = 1 },
+                    { pane = 2, icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
+                    { pane = 2, icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
+                    {
+                        pane = 2,
+                        icon = " ",
+                        title = "Git Status",
+                        section = "terminal",
+                        enabled = function()
+                            return Snacks.git.get_root() ~= nil
+                        end,
+                        cmd = "git status --short --branch --renames",
+                        height = 5,
+                        padding = 1,
+                        ttl = 5 * 60,
+                        indent = 3,
+                    },
+                    { section = "startup" },
+                },
+            },
+            indent = { enabled = true },
+            input = { enabled = true },
+            notifier = { enabled = true },
+            scope = { enabled = true },
+            scroll = { enabled = true },
+            statuscolumn = { enabled = true },
+            words = { enabled = true },
+        },
+    },
 
     -- Fern
     {
@@ -72,8 +163,6 @@ require("lazy").setup({
             'nvim-lua/plenary.nvim',
             'nvim-telescope/telescope-live-grep-args.nvim',
             'nvim-telescope/telescope-file-browser.nvim',
-            'natecraddock/telescope-zf-native.nvim'
-
         },
         config = function() require('plugins.telescope') end,
     },
@@ -87,15 +176,6 @@ require("lazy").setup({
         end
     },
 
-
-    -- LSP
-    { 'williamboman/mason.nvim' },
-    { 'williamboman/mason-lspconfig.nvim' },
-    { 'VonHeikemen/lsp-zero.nvim',        branch = 'v3.x' },
-    { 'neovim/nvim-lspconfig' },
-    { 'hrsh7th/cmp-nvim-lsp' },
-    { 'hrsh7th/nvim-cmp' },
-    { 'L3MON4D3/LuaSnip',                 build = "make install_jsregexp" },
 
     -- Tim Pope
     'tpope/vim-surround',
@@ -145,17 +225,7 @@ require("lazy").setup({
         }
     },
     { 'folke/trouble.nvim', config = function() require('trouble').setup({}) end, dependencies = { "nvim-tree/nvim-web-devicons" } },
-    {
-        "folke/noice.nvim",
-        config = function() require('plugins.noice') end,
-        event = "VeryLazy",
-        opts = {
-        },
-        dependencies = {
-            "MunifTanjim/nui.nvim",
-            { "rcarriga/nvim-notify", config = function() require('plugins.notify') end },
-        }
-    } })
+})
 
 -- theme
 -- Gruvbox initialization
@@ -167,192 +237,61 @@ vim.cmd([[colorscheme gruvbox]])
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 
--- lsp
-local lsp = require('lsp-zero').preset({
-    suggest_lsp_servers = true,
-})
-require('mason').setup({
-    log_level = vim.log.levels.DEBUG
-})
-require('mason-lspconfig').setup({
-    ensure_installed = { 'tsserver', 'eslint', 'lua_ls' },
-    handlers = {
-        lsp.default_setup,
-        lua_ls = function()
-            local lua_opts = lsp.nvim_lua_ls()
-            require('lspconfig').lua_ls.setup(lua_opts)
-        end,
-    }
+-- LSP
+
+vim.lsp.enable({
+    'angular',
+    'astro',
+    'eslint',
+    'gopls',
+    'lua_ls',
+    'typescript',
 })
 
-local cmp = require('cmp')
-local cmp_action = require('lsp-zero').cmp_action()
-local cmp_format = require('lsp-zero').cmp_format()
-cmp.setup({
-    formatting = cmp_format,
-    sources = {
-        { name = "supermaven" },
-    }
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+vim.diagnostic.config({
+    virtual_lines = true
 })
 
-lsp.on_attach(function(client, bufnr)
-    lsp.default_keymaps({ buffer = bufnr })
+vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(ev)
+        local client = vim.lsp.get_client_by_id(ev.data.client_id)
+        if client:supports_method('textDocument/completion') then
+            vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+            vim.keymap.set('i', '<C-I>', function()
+                vim.lsp.completion.get()
+            end)
 
-    km.set("n", "<leader>la", function() vim.lsp.buf.code_action() end)
-    km.set("n", "<leader>lf", function() vim.lsp.buf.format() end)
-    km.set("n", "<leader>lo", function() vim.lsp.buf.open_float() end)
-    km.set("n", "gd", function() vim.lsp.buf.definition() end)
-    km.set("n", "gD", function() vim.lsp.buf.declaration() end)
-    km.set("n", "gI", function() vim.lsp.buf.implementation() end)
-    km.set("n", "go", function() vim.lsp.buf.type_definition() end)
-    km.set("n", "gr", function() vim.lsp.buf.references() end)
-end)
-
-cmp.setup({
-    mapping = {
-        ["<CR>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-                local entry = cmp.get_selected_entry()
-                if not entry then
-                    cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
-                else
-                    cmp.confirm()
-                end
-            else
-                fallback()
-            end
-        end, { "i", "s", "c", }),
-        ['<S-Tab>'] = cmp.mapping(function()
-            if cmp.visible() then
-                cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
-            end
-        end, { "i", "s", "c", })
-    }
+            vim.keymap.set('n', '<leader>lf', function()
+                vim.lsp.buf.format({ async = true })
+            end)
+        end
+    end,
 })
-
-lsp.setup()
-
-function toggle_fold(char)
-    local fold_command = ''
-
-    if vim.fn.foldlevel('.') > 0 then
-        fold_command = 'za'
-    else
-        fold_command = 'va' .. char .. 'zf'
-    end
-
-    vim.cmd('normal! ' .. fold_command)
-end
 
 -- Fern
 vim.g['fern#renderer'] = 'nerdfont'
 
--- Ajoute cette fonction à ton init.lua
-function close_nvim_if_last_fern_buffer()
-    -- Vérifie si le seul buffer ouvert a un filetype "fern"
-    local num_windows = vim.fn.winnr('$') - 1
-    print(num_windows)
+local function close_nvim_if_last_fern_buffer()
+    -- Délai pour laisser le temps aux fenêtres de se fermer
+    vim.defer_fn(function()
+        local wins = vim.api.nvim_list_wins()
+        local normal_wins = vim.tbl_filter(function(win)
+            local config = vim.api.nvim_win_get_config(win)
+            return config.relative == ''
+        end, wins)
 
-    if num_windows == 1 and vim.api.nvim_buf_get_option(0, 'filetype') == 'fern' then
-        vim.cmd('qall!')
-    end
+        if #normal_wins == 1 then
+            local buf = vim.api.nvim_win_get_buf(normal_wins[1])
+            if vim.api.nvim_get_option_value('filetype', { buf = buf }) == 'fern' then
+                vim.cmd('qall!')
+            end
+        end
+    end, 10) -- Délai de 10ms
 end
 
--- Ajoute cette autocmd pour appeler la fonction avant de quitter Neovim
-vim.api.nvim_exec(
-    [[
-augroup CloseNvimIfLastFernBuffer
-    autocmd!
-    autocmd WinClosed,WinClosed,VimLeavePre lua close_nvim_if_last_fern_buffer()
-augroup END
-]],
-    false)
-
-
--- Remaps
--- edition
-km.set("n", "<leader>rw", ":g/^$/d<CR>")
--- search
-km.set("n", "<leader>\\", ":noh<CR>")
--- buffers
-km.set("n", "<leader>bn", ":bnext<CR>")
-km.set("n", "<leader>bp", ":bprevious<CR>")
-km.set("n", "<leader>bd", ":bd!<CR>")
-km.set("n", "<leader>br", ":redraw<CR>")
-km.set("n", "<leader>bx", ":%bd|e#<CR>")
---tabs
-km.set("n", "<leader>tt", ":tabnew<CR>")
-km.set("n", "<leader>tc", ":tabclose<CR>")
-km.set("n", "<leader>tn", ":tabnext<CR>")
-km.set("n", "<leader>tp", ":tabprev<CR>")
--- window splits
-km.set("n", "<leader>ws", "<C-w>s")
-km.set("n", "<leader>wsj", "<C-w>s<C-w>j")
-km.set("n", "<leader>wv", "<C-w>v")
-km.set("n", "<leader>wvl", "<C-w>v<C-w>l")
-km.set("n", "<leader>wvh", "<C-w>v<C-w>h")
-km.set("n", "<leader>ww", "<C-w>n")
-km.set("n", "<leader>wx", "<C-w>x") -- swap with the split on the right
-km.set("n", "<leader>wr", "<C-w>r") -- rotates clockwise
-km.set("n", "<leader>wR", "<C-w>R") -- rotates counterclockwise
-km.set("n", "<leader>wc", "<C-w>q")
-km.set("n", "<leader>wj", "<C-w>j")
-km.set("n", "<leader>wk", "<C-w>k")
-km.set("n", "<leader>wh", "<C-w>h")
-km.set("n", "<leader>wl", "<C-w>l")
-km.set("n", "<leader>mp", ":rightbelow vsplit | terminal glow %<CR>")
--- Telescope
-local builtin = require('telescope.builtin')
-local live_grep_args_shortcuts = require('telescope-live-grep-args.shortcuts')
-km.set('n', '<leader>ff', builtin.find_files, {})
-km.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { silent = true, noremap = true })
-km.set('n', '<leader>bl', builtin.buffers, {})
-km.set('n', '<leader>pf', builtin.git_files, {})
-km.set('n', '<leader>fo', builtin.oldfiles, {})
-km.set('n', '<leader>pg', builtin.git_status, {})
-km.set('n', '<leader>pt', ':Telescope file_browser<CR>', {})
-km.set('n', '<leader>pn', ':Telescope notify<CR>', {})
-km.set("n", "<leader>ps", ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>")
-km.set("n", "<leader>pV", live_grep_args_shortcuts.grep_visual_selection)
--- notify
-local notify = require('notify')
-local noice = require('noice')
-km.set("n", "<leader>nc", notify.dismiss, {})
-km.set("n", "<leader>nl", function() noice.cmd("last") end)
-km.set("n", "<leader>nh", function() noice.cmd("history") end)
--- fern
-km.set("n", "<leader>ee", ":Fern . -drawer -width=60 -toggle -right<CR>", { silent = true, noremap = true })
-km.set("n", "<leader>es", ":Fern . -reveal=% -drawer -width=60 -toggle -right<CR>", { silent = true, noremap = true })
--- Trouble
-km.set("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xl", "<cmd>Trouble loclist toggle<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xq", "<cmd>Trouble qflist toggle<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xR", "<cmd>Trouble lsp toggle<cr>", { silent = true, noremap = true })
-km.set("n", "<leader>xt", "<cmd>Trouble todo toggle<cr>", { silent = true, noremap = true })
--- Scretch
-local scretch = require('scretch')
-km.set('n', '<leader>sn', scretch.new)
-km.set('n', '<leader>snn', scretch.new_named)
-km.set('n', '<leader>sft', scretch.new_from_template)
-km.set('n', '<leader>sat', scretch.save_as_template)
-km.set('n', '<leader>sl', scretch.last)
-km.set('n', '<leader>ss', scretch.search)
-km.set('n', '<leader>st', scretch.edit_template)
-km.set('n', '<leader>sg', scretch.grep)
-km.set('n', '<leader>sv', scretch.explore)
--- Grugfar
-km.set('n', '<leader>Gf', ':lua require("grug-far").grug_far({ prefills = { flags = vim.fn.expand("%") } })<cr>',
-    { noremap = true, silent = true })
--- Supermaven
-km.set('n', '<leader>St', '<cmd>SupermavenToggle<cr>', { silent = true, noremap = true })
--- undotree
-km.set('n', '<leader>u', vim.cmd.UndotreeToggle)
--- folds
-km.set('n', 'z}', ':lua toggle_fold("}")<CR>', { noremap = true, silent = true })
-km.set('n', 'z{', ':lua toggle_fold("{")<CR>', { noremap = true, silent = true })
-km.set('n', 'z)', ':lua toggle_fold(")")<CR>', { noremap = true, silent = true })
-km.set('n', 'z(', ':lua toggle_fold("(")<CR>', { noremap = true, silent = true })
-km.set('n', 'z]', ':lua toggle_fold("]")<CR>', { noremap = true, silent = true })
-km.set('n', 'z[', ':lua toggle_fold("[")<CR>', { noremap = true, silent = true })
-km.set('n', 'zT', ':lua toggle_fold("t")<CR>', { noremap = true, silent = true })
+vim.api.nvim_create_augroup('CloseNvimIfLastFernBuffer', { clear = true })
+vim.api.nvim_create_autocmd('WinClosed', {
+    group = 'CloseNvimIfLastFernBuffer',
+    callback = close_nvim_if_last_fern_buffer
+})

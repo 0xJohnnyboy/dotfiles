@@ -1,130 +1,96 @@
 local wk = require("which-key")
+local telescope = require("telescope.builtin")
+local telescope_live_grep = require("telescope-live-grep-args.shortcuts")
+local scretch = require("scretch")
 wk.setup({
     -- ignore_missing = true
 })
 
-local leader_normal_opts = {
-    prefix = "<leader>",
-    mode = "n",
-    silent = true,
-}
-local leader_normal_mappings = {
-    { "<leader>D",   group = "Database" },
-    { "<leader>Df",  desc = "Find buffer" },
-    { "<leader>Dq",  desc = "Last query info" },
-    { "<leader>Dr",  desc = "Rename buffer" },
-    { "<leader>Du",  desc = "Toggle UI" },
-    { "<leader>\\",  desc = "Remove highlighting after search" },
+wk.add({
+    { "<leader>\\",  ":noh<CR>",                                                                 desc = "Remove highlighting after search" },
+
     { "<leader>b",   group = "buffer" },
-    { "<leader>bd",  desc = "Close buffer" },
-    { "<leader>bl",  desc = "List buffers" },
-    { "<leader>bn",  desc = "Next buffer" },
-    { "<leader>bp",  desc = "Previous buffer" },
-    { "<leader>br",  desc = "Refresh buffers (redraw)" },
-    { "<leader>bx",  desc = "Close all buffers but the current one" },
+    { "<leader>bd",  ":bd!<CR>",                                                                 desc = "Close buffer" },
+    { "<leader>bl",  telescope.buffers,                                                          desc = "List buffers" },
+    { "<leader>bn",  ":bnext<CR>",                                                               desc = "Next buffer" },
+    { "<leader>bp",  ":bprevious<CR>",                                                           desc = "Previous buffer" },
+    { "<leader>br",  ":redraw<CR>",                                                              desc = "Refresh buffers (redraw)" },
+    { "<leader>bx",  ":%bd|e#<CR>",                                                              desc = "Close all buffers but the current one" },
+
     { "<leader>c",   group = "Comment" },
     { "<leader>cA",  desc = "Insert comment at the end of the line" },
     { "<leader>cO",  desc = "Insert comment on the line above" },
     { "<leader>cb",  desc = "Toggle block comment" },
     { "<leader>cl",  desc = "Toggle line comment" },
     { "<leader>co",  desc = "Insert comment on the line below" },
-    { "<leader>e",   group = "NvimTree" },
-    { "<leader>ee",  desc = "Toggle" },
-    { "<leader>ef",  desc = "Focus" },
-    { "<leader>es",  desc = "Show file in tree" },
+
+    { "<leader>e",   group = "Fern" },
+    { "<leader>ee",  ":Fern . -drawer -width=60 -toggle -right<CR>",                             desc = "Toggle" },
+    { "<leader>es",  ":Fern . -reveal=% -drawer -width=60 -toggle -right<CR>",                   desc = "Show file in tree" },
+
     { "<leader>f",   group = "Find" },
-    { "<leader>ff",  desc = "Fuzze find file" },
-    { "<leader>fo",  desc = "Find old file" },
-    { "<leader>l",   group = "LSP" },
-    { "<leader>la",  desc = "Code action" },
-    { "<leader>lf",  desc = "Format" },
-    { "<leader>lo",  desc = "Open diagnostics float window" },
-    { "<leader>mp",  desc = "Markdown preview with glow" },
+    { "<leader>ff",  telescope.find_files,                                                       desc = "Files" },
+    { "<leader>fo",  telescope.oldfiles,                                                         desc = "Old file" },
+    { "<leader>fs",  ":Telescope lsp_document_symbols ignore_symbols=variable<CR>",              desc = "Symbols" },
+    { "<leader>ft",  "<cmd>TodoTelescope<CR>",                                                   desc = "Todos" },
+
+    { "<leader>Gf",  "<cmd>GrugFar<cr>",                                                         desc = "Grug far" },
+
+    -- { "<leader>l",   group = "LSP" },
+    -- { "<leader>la",  desc = "Code action" },
+    -- { "<leader>lf",  desc = "Format" },
+    -- { "<leader>lo",  desc = "Open diagnostics float window" },
+    -- { "<leader>mp",  desc = "Markdown preview with glow" },
+
     { "<leader>p",   group = "Project" },
-    { "<leader>pf",  desc = "Search project files (git)" },
-    { "<leader>pg",  desc = "Project git status" },
-    { "<leader>ps",  desc = "Live grep" },
-    { "<leader>pt",  desc = "Telescope explorer" },
-    { "<leader>rm",  desc = "Remove whitelines" },
+    { "<leader>pf",  telescope.git_files,                                                        desc = "Search project files (git)" },
+    { "<leader>pg",  telescope.git_status,                                                       desc = "Project git status" },
+    { "<leader>ps",  ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", desc = "Live grep" },
+    { "<leader>pt",  ":Telescope file_browser<CR>",                                              desc = "Telescope explorer" },
+
     { "<leader>s",   group = "Scretch.nvim" },
-    { "<leader>sg",  desc = "Live grep scretches" },
-    { "<leader>sl",  desc = "Toggle last scretch" },
-    { "<leader>sn",  desc = "New scretch" },
-    { "<leader>snn", desc = "New named scretch" },
-    { "<leader>ss",  desc = "Search scretches" },
-    { "<leader>sv",  desc = "Explore scretches" },
+    { "<leader>sn",  scretch.new,                                                                desc = "New" },
+    { "<leader>snn", scretch.new_named,                                                          desc = "New named" },
+    { "<leader>sft", scretch.new_from_template,                                                  desc = "New from template" },
+    { "<leader>sat", scretch.save_as_template,                                                   desc = "Save as template" },
+    { "<leader>sl",  scretch.last,                                                               desc = "Open last" },
+    { "<leader>ss",  scretch.search,                                                             desc = "Search" },
+    { "<leader>st",  scretch.edit_template,                                                      desc = "Edit template" },
+    { "<leader>sg",  scretch.grep,                                                               desc = "Grep" },
+    { "<leader>sv",  scretch.explore,                                                            desc = "Explore" },
+
     { "<leader>t",   group = "Tabs" },
-    { "<leader>tc",  desc = "Close" },
-    { "<leader>tn",  desc = "Next" },
-    { "<leader>tp",  desc = "Prev" },
-    { "<leader>tt",  desc = "New" },
-    { "<leader>u",   desc = "Toggle undotree" },
-    { "<leader>w",   group = "Window" },
-    { "<leader>wc",  desc = "Close pane" },
-    { "<leader>wh",  desc = "Focus left" },
-    { "<leader>wj",  desc = "Focus down" },
-    { "<leader>wk",  desc = "Focus up" },
-    { "<leader>wl",  desc = "Focus right" },
-    { "<leader>ws",  desc = "Split horizontally" },
-    { "<leader>wsj", desc = "Split horizontally and focus down" },
-    { "<leader>wv",  desc = "Split vertically" },
-    { "<leader>wvl", desc = "Split vertically and focus right" },
-    { "<leader>ww",  desc = "New buffer in new pane" },
+    { "<leader>tc",  ":tabclose<CR>",                                                            desc = "Close" },
+    { "<leader>tn",  ":tabnext<CR>",                                                             desc = "Next" },
+    { "<leader>tp",  ":tabprev<CR>",                                                             desc = "Prev" },
+    { "<leader>tt",  ":tabnew<CR>",                                                              desc = "New" },
+
+    { "<leader>u",   vim.cmd.UndotreeToggle,                                                     desc = "Toggle undotree" },
+
+    { "<leader>w",   proxy = "<C-w>",                                                            group = "Window" },
+
     { "<leader>x",   group = "Trouble" },
-    { "<leader>xR",  desc = "Trouble LSP references" },
-    { "<leader>xd",  desc = "Trouble document diagnostics" },
-    { "<leader>xl",  desc = "Trouble loclist" },
-    { "<leader>xq",  desc = "Trouble quickfix" },
-    { "<leader>xw",  desc = "Trouble workspace diagnostics" },
-    { "<leader>xx",  desc = "Toggle Trouble" },
-}
--- <LEADER> VISUAL MODE
-local leader_visual_opts = {
-    prefix = "<leader>",
-    mode = "v",
-    silent = true,
-}
-local leader_visual_mappings = {
+    { "<leader>xx",  "<cmd>Trouble diagnostics toggle<cr>",                                      desc = "Toggle" },
+    { "<leader>xd",  "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",                         desc = "Document diagnostics" },
+    { "<leader>xl",  "<cmd>Trouble loclist toggle<cr>",                                          desc = "Loclist" },
+    { "<leader>xq",  "<cmd>Trouble qflist toggle<cr>",                                           desc = "Quickfix List" },
+    { "<leader>xR",  "<cmd>Trouble lsp toggle<cr>",                                              desc = "Lsp References" },
+    { "<leader>xt",  "<cmd>Trouble todo toggle<cr>",                                             desc = "Todo" },
+
+    -- VISUAL MODE
     {
         mode = { "v" },
         { "<leader>c",  group = "Comment" },
         { "<leader>cb", desc = "Toggle block comment" },
         { "<leader>cl", desc = "Toggle line comment" },
-        { "<leader>pV", desc = "Live grep visual selection" },
+         
+        { "<leader>pV",  telescope_live_grep.grep_visual_selection,                                  desc = "Live grep visual selection" },
     },
-}
 
--- NORMAL MODE
-local normal_opts = {
-    mode = "n",
-    silent = true
-}
-local normal_mappings = {
-    { "[d", desc = "Go to next diagnostic" },
-    { "]d", desc = "Go to previous diagnostic" },
-    { "gD", desc = "Go to declaration" },
-    { "gI", desc = "Go to implementation" },
-    { "gd", desc = "Go to definition" },
-    { "go", desc = "Go to type definition" },
-    { "gr", desc = "Go to type references" },
-    { "z",  group = "Folds" },
-    { "z(", desc = "Toggle ( fold" },
-    { "z)", desc = "Toggle ) fold" },
-    { "zT", desc = "Toggle tag fold" },
-    { "z[", desc = "Toggle [ fold" },
-    { "z]", desc = "Toggle ] fold" },
-    { "z{", desc = "Toggle { fold" },
-    { "z}", desc = "Toggle } fold" },
-}
-
--- INSERT MODE
-local insert_opts = {
-    mode = "i",
-    silent = true
-}
-local insert_mappings = {
-}
-wk.register(leader_normal_mappings, leader_normal_opts)
-wk.register(leader_visual_mappings, leader_visual_opts)
-wk.register(normal_mappings, normal_opts)
-wk.register(insert_mappings, insert_opts)
+    -- INSERT MODE
+    -- {
+    --     mode = { "i" },
+    --     { "<C-J>", vim.lsp.completion.get(), desc = "get lsp completion" }
+    --
+    -- },
+})

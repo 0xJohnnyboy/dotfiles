@@ -1,4 +1,9 @@
-require('scretch').setup({
-    scretch_dir = vim.fn.stdpath('data') .. '/scretch/files',
-    template_dir = vim.fn.stdpath('data') .. '/scretch/templates',
-})
+return {
+    '0xJohnnyboy/scretch.nvim',
+    config = function()
+        require('scretch').setup({
+            scretch_dir = vim.fn.stdpath('data') .. '/scretch/files',
+            template_dir = vim.fn.stdpath('data') .. '/scretch/templates',
+        })
+    end,
+}

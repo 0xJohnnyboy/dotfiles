@@ -1,9 +1,11 @@
 return {
     '0xJohnnyboy/scretch.nvim',
+    -- dir = '~/projects/perso/scretch.nvim',
     config = function()
         require('scretch').setup({
-            scretch_dir = vim.fn.stdpath('data') .. '/scretch/files',
-            template_dir = vim.fn.stdpath('data') .. '/scretch/templates',
+            use_project_dir = {
+                scretch = 'auto'
+            },
         })
-    end,
+    end
 }

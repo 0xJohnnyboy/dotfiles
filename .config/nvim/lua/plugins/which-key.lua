@@ -79,8 +79,9 @@ return {
             { "<leader>td",  ":lua require('neotest').run.run({strategy = 'dap'})<cr>",                  desc = "Debug nearest test" },
 
             { "<leader>d",   group = "Debug" },
-            { "<leader>db",  ":lua require('dap').toggle_breakpoint()<cr>",                              desc = "Toggle breakpoint" },
-            { "<leader>dB",  ":lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<cr>", desc = "Conditional breakpoint" },
+            { "<leader>db",  ":lua require('persistent-breakpoints.api').toggle_breakpoint()<cr>",       desc = "Toggle breakpoint" },
+            { "<leader>dB",  ":lua require('persistent-breakpoints.api').set_conditional_breakpoint()<cr>", desc = "Conditional breakpoint" },
+            { "<leader>dC",  ":Telescope dap commands<cr>",                                              desc = "DAP commands" },
             { "<leader>dc",  ":lua require('dap').continue()<cr>",                                       desc = "Continue" },
             { "<leader>di",  ":lua require('dap').step_into()<cr>",                                      desc = "Step into" },
             { "<leader>do",  ":lua require('dap').step_over()<cr>",                                      desc = "Step over" },
@@ -89,6 +90,10 @@ return {
             { "<leader>dl",  ":lua require('dap').run_last()<cr>",                                       desc = "Run last" },
             { "<leader>dt",  ":lua require('dap').terminate()<cr>",                                      desc = "Terminate" },
             { "<leader>du",  ":lua require('dapui').toggle()<cr>",                                       desc = "Toggle UI" },
+            { "<leader>dv",  ":Telescope dap variables<cr>",                                             desc = "View variables" },
+            { "<leader>df",  ":Telescope dap frames<cr>",                                                desc = "View frames" },
+            { "<leader>dL",  ":Telescope dap list_breakpoints<cr>",                                      desc = "List breakpoints" },
+            { "<leader>dx",  ":lua require('persistent-breakpoints.api').clear_all_breakpoints()<cr>",  desc = "Clear all breakpoints" },
             { "<leader>dg",  ":lua require('dap-go').debug_test()<cr>",                                  desc = "Debug Go test" },
             { "<leader>dG",  ":lua require('dap-go').debug_last_test()<cr>",                             desc = "Debug last Go test" },
 

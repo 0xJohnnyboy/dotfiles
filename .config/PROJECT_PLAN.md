@@ -19,13 +19,14 @@ Transform the current multi-branch dotfiles repository into a unified, cross-pla
 
 ### Key Differences Between Branches
 
-**macOS-only (main branch)**:
-- `.config/sketchybar/` - macOS status bar
-- `.config/skhd/` - macOS hotkey daemon
-- `.config/yabai/` - macOS window manager
-- `.config/wtf/` - Dashboard widget
-- `.config/macos_playbook.yml` - Old Ansible playbook
-- `.config/macos_setup.sh` - Old setup script
+**macOS-only (main branch)** [UPDATED]:
+- `.config/aerospace/` - macOS tiling window manager (CURRENT)
+- Ice Bar - macOS menu bar (no config files needed)
+- ~~`.config/sketchybar/`~~ - REMOVED (obsolete)
+- ~~`.config/skhd/`~~ - REMOVED (obsolete)
+- ~~`.config/yabai/`~~ - REMOVED (obsolete)
+- ~~`.config/macos_playbook.yml`~~ - REMOVED (obsolete)
+- ~~`.config/macos_setup.sh`~~ - REMOVED (obsolete)
 - Brewfile reference in .zshrc
 
 **WSL/Linux (windows-wsl branch)**:
@@ -71,10 +72,8 @@ Transform the current multi-branch dotfiles repository into a unified, cross-pla
 │   │   └── wezterm.lua
 │   ├── starship.toml                  # Starship (unified)
 │   ├── git/                           # Git config
-│   ├── macos/                         # macOS-only configs
-│   │   ├── sketchybar/
-│   │   ├── skhd/
-│   │   └── yabai/
+│   ├── aerospace/                     # macOS tiling window manager
+│   │   └── aerospace.toml
 │   └── ansible/                       # NEW: Ansible automation
 │       ├── ansible.cfg
 │       ├── playbook.yml
@@ -155,55 +154,60 @@ git_version: "2.47.0"
 
 ## Implementation Plan
 
-### Phase 1: Branch Merge & Conflict Resolution
+### Phase 1: Branch Merge & Conflict Resolution ✅ COMPLETED
 
 **Goal**: Merge windows-wsl into main, resolving conflicts with OS detection
 
 **Steps**:
 1. ✅ Create backup branch from current windows-wsl
-2. Checkout main branch
-3. Merge windows-wsl into main
-4. Resolve conflicts:
-   - `.zshrc`: Keep windows-wsl version, fix dotfiles alias to `.dotfiles`
-   - `nvim/init.lua`: Keep windows-wsl version (complete rewrite)
-   - `starship.toml`: Merge manually
-   - `tmux/`: Keep windows-wsl version
-5. Move macOS-only configs to `.config/macos/`
-6. Delete old macos_playbook.yml and macos_setup.sh
+2. ✅ Checkout main branch
+3. ✅ Merge windows-wsl into main with rebase
+4. ✅ Resolve conflicts:
+   - `.zshrc`: Merged both versions, fixed dotfiles alias to `.dotfiles.git`
+   - `nvim/init.lua`: Kept modular version (HEAD)
+   - `nvim/lazy-lock.json`: Kept current version
+   - `wezterm/wezterm.lua`: Kept cross-platform version
+   - `tmux/tmux.conf`: Fixed quoting
+5. ✅ Remove obsolete sketchybar configs
+6. ✅ Remove obsolete macos_playbook.yml and macos_setup.sh
 
-**Files Needing OS Detection**:
-- `.zshrc` - Conditional aliases, PATH, plugins
-- WezTerm - Already has it! Just clean up
-- Neovim - Minimal (mostly works cross-platform)
+**Files with OS Detection**:
+- ✅ `.zshrc` - Already has conditional aliases, PATH, plugins
+- ✅ WezTerm - Already has proper OS detection
+- ✅ Neovim - Fully cross-platform (no OS detection needed)
 
-**Estimated Time**: 1-2 hours
+**Actual Time**: Completed
 
-### Phase 2: Config Refactoring
+### Phase 2: Config Refactoring ✅ COMPLETED
 
 **Goal**: Add OS detection to configs that need it
 
 **Tasks**:
 
-#### 2.1 Refactor .zshrc
-- Add OS detection at top
-- Conditional Homebrew PATH (macOS only)
-- Conditional aliases (e.g., `update` command)
-- Keep dotfiles alias consistent (`.dotfiles`)
-- Add conditional plugin loading (asdf, etc.)
+#### 2.1 Refactor .zshrc ✅
+- ✅ OS detection already at top
+- ✅ Conditional Homebrew PATH (macOS only) - already implemented
+- ✅ Conditional aliases - already implemented
+- ✅ Dotfiles alias consistent (`.dotfiles.git`)
+- ✅ Conditional plugin loading (asdf, etc.) - already implemented
 
-#### 2.2 Clean Up WezTerm Config
-Already has both `macos_window_background_blur` and `win32_system_backdrop`, just verify it works
+#### 2.2 Clean Up WezTerm Config ✅
+- ✅ Already has proper OS detection for macOS, WSL, and Linux
+- ✅ Platform-specific settings (blur for macOS, acrylic for WSL)
+- ✅ Platform-specific font names
 
-#### 2.3 Review Neovim Config
-Most should work cross-platform, but check:
-- LSP server paths
-- Any hardcoded paths
-- Terminal-specific settings
+#### 2.3 Review Neovim Config ✅
+- ✅ LSP configs are fully cross-platform (no hardcoded paths)
+- ✅ All LSP servers use simple command names in PATH
+- ✅ No OS-specific code needed
 
-#### 2.4 Create .config/macos/ Directory
-Move macOS-specific configs there with README explaining they're loaded conditionally
+#### 2.4 macOS-Specific Configs ✅
+- ✅ Removed obsolete sketchybar, yabai, skhd configs
+- ✅ Keeping aerospace config in `.config/aerospace/`
+- ✅ Ice Bar (no config files needed)
+- Note: Not creating separate macos/ directory since only aerospace config remains
 
-**Estimated Time**: 2-3 hours
+**Actual Time**: Completed
 
 ### Phase 3: Ansible Infrastructure
 
@@ -308,8 +312,9 @@ Move macOS-specific configs there with README explaining they're loaded conditio
 **macos_tools** (macOS-specific):
 - Install Homebrew
 - Install from Brewfile
-- Install yabai, skhd, sketchybar
-- Apply configs from .config/macos/
+- Install aerospace (tiling window manager)
+- Install ice bar (menu bar)
+- Apply aerospace config from .config/aerospace/
 - when: ansible_os_family == "Darwin"
 - Tags: macos, wm
 
@@ -543,9 +548,8 @@ git --git-dir=.dotfiles --work-tree=. checkout
 
 ### macOS-Specific
 - Homebrew
-- yabai (window manager)
-- skhd (hotkey daemon)
-- sketchybar (status bar)
+- aerospace (tiling window manager)
+- ice bar (menu bar)
 - Brewfile packages
 
 ## Success Criteria

@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 DOTFILES_REPO="git@github.com:0xJohnnyboy/dotfiles.git"
-DOTFILES_DIR="$HOME/.dotfiles"
+DOTFILES_DIR="$HOME/.dotfiles.git"
 ANSIBLE_PLAYBOOK="$HOME/.config/ansible/playbook.yml"
 
 # =============================================================================
@@ -285,7 +285,7 @@ EOF
     log_info "Step 6/6: Final setup..."
 
     # Add dotfiles alias to current shell session
-    alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
+    alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles.git --work-tree=$HOME"
 
     log_success "Installation complete!"
     echo ""

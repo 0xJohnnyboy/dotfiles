@@ -38,6 +38,12 @@ source $ZSH/oh-my-zsh.sh
 # Environment Variables
 # =============================================================================
 
+# Additional paths
+export PATH="/opt/projects:$PATH"
+export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
+export PATH="$PATH:$HOME/.dotnet/tools"
+
 # Editor
 export EDITOR=nvim
 export NVIM_CONFIG="$HOME/.config/nvim/init.lua"
@@ -280,3 +286,7 @@ fi
 if command -v ng &> /dev/null; then
     source <(ng completion script)
 fi
+
+# Additional tool paths (from stash)
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"

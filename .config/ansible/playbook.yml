@@ -1,0 +1,91 @@
+---
+- name: Setup Development Environment
+  hosts: local
+  gather_facts: true
+
+  vars_files:
+    - group_vars/all.yml
+
+  pre_tasks:
+    - name: Display OS information
+      debug:
+        msg: |
+          OS Family: {{ ansible_os_family }}
+          Distribution: {{ ansible_distribution }}
+          Version: {{ ansible_distribution_version }}
+          Kernel: {{ ansible_kernel }}
+          Architecture: {{ ansible_architecture }}
+      tags: [always]
+
+    - name: Detect WSL
+      set_fact:
+        is_wsl: "{{ ansible_kernel is search('microsoft|WSL', ignorecase=True) }}"
+      tags: [always]
+
+    - name: Display WSL status
+      debug:
+        msg: "Running on WSL: {{ is_wsl }}"
+      tags: [always]
+
+  roles:
+    - role: prerequisites
+      tags: [prereqs, build]
+      when: build_from_source
+
+    - role: git
+      tags: [git, vcs]
+      when: build_from_source
+
+    - role: neovim
+      tags: [neovim, editor]
+
+    - role: shell
+      tags: [shell, zsh]
+
+    - role: tmux
+      tags: [tmux, terminal]
+
+    - role: terminal
+      tags: [terminal, wezterm]
+
+    - role: cli_tools
+      tags: [cli, tools]
+
+    - role: docker
+      tags: [docker, containers]
+      when: install_docker and ansible_os_family != "Darwin"
+
+    - role: languages
+      tags: [languages, dev, golang, nodejs, rust]
+      when: install_languages
+
+    - role: macos_tools
+      tags: [macos, wm, aerospace]
+      when: ansible_os_family == "Darwin" and install_macos_tools
+
+    - role: dotfiles
+      tags: [dotfiles, config]
+
+  post_tasks:
+    - name: Display completion message
+      debug:
+        msg: |
+          ===================================================================
+          🎉 Development environment setup complete!
+          ===================================================================
+
+          Next steps:
+          1. Reload your shell: exec zsh
+          2. Verify installations:
+             - git --version
+             - nvim --version
+             - tmux -V
+             - go version (if installed)
+             - node --version (if installed)
+
+          3. Start tmux: tmux
+          4. Open nvim and let plugins install: nvim
+
+          Enjoy your new setup! 🚀
+          ===================================================================
+      tags: [always]

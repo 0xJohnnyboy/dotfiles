@@ -1,0 +1,59 @@
+---
+- name: Check if neovim is already installed
+  command: nvim --version
+  register: nvim_check
+  changed_when: false
+  failed_when: false
+
+- name: Display current neovim version
+  debug:
+    msg: "Current neovim version: {{ nvim_check.stdout_lines[0] | default('not installed') }}"
+
+- name: Create temporary build directory
+  file:
+    path: "/tmp/neovim-build"
+    state: directory
+    mode: '0755'
+  when: nvim_check.rc != 0 or neovim_version not in nvim_check.stdout
+
+- name: Clone neovim repository
+  git:
+    repo: "https://github.com/neovim/neovim.git"
+    dest: "/tmp/neovim-build/neovim"
+    version: "v{{ neovim_version }}"
+    depth: 1
+  when: nvim_check.rc != 0 or neovim_version not in nvim_check.stdout
+
+- name: Build neovim
+  shell: |
+    make CMAKE_BUILD_TYPE=RelWithDebInfo
+  args:
+    chdir: "/tmp/neovim-build/neovim"
+  when: nvim_check.rc != 0 or neovim_version not in nvim_check.stdout
+
+- name: Install neovim
+  shell: |
+    sudo make install
+  args:
+    chdir: "/tmp/neovim-build/neovim"
+  when: nvim_check.rc != 0 or neovim_version not in nvim_check.stdout
+
+- name: Clean up build directory
+  file:
+    path: "/tmp/neovim-build"
+    state: absent
+
+- name: Ensure neovim config directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.config/nvim"
+    state: directory
+    mode: '0755'
+
+- name: Verify neovim installation
+  command: nvim --version
+  register: nvim_verify
+  changed_when: false
+
+- name: Display installed neovim version
+  debug:
+    msg: "✅ Neovim {{ nvim_verify.stdout_lines[0].split()[1] }} installed successfully"

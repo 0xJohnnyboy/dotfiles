@@ -1,0 +1,49 @@
+---
+# Linux-specific variables
+
+# Package manager (auto-detected)
+package_manager: apt  # apt, dnf, pacman, etc.
+
+# Build dependencies (Debian/Ubuntu)
+build_dependencies_apt:
+  - build-essential
+  - cmake
+  - autoconf
+  - automake
+  - pkg-config
+  - gettext
+  - libtool
+  - libssl-dev
+  - zlib1g-dev
+  - libcurl4-openssl-dev
+  - libexpat1-dev
+  - wget
+  - curl
+  - unzip
+  - ninja-build
+
+# Build dependencies (Fedora/RHEL)
+build_dependencies_dnf:
+  - gcc
+  - gcc-c++
+  - make
+  - cmake
+  - autoconf
+  - automake
+  - pkgconfig
+  - gettext-devel
+  - libtool
+  - openssl-devel
+  - zlib-devel
+  - libcurl-devel
+  - expat-devel
+  - wget
+  - curl
+  - unzip
+  - ninja-build
+
+# Font installation path
+font_install_path: "{{ ansible_user_dir }}/.local/share/fonts"
+
+# Detect WSL
+is_wsl: "{{ ansible_kernel is search('microsoft|WSL', ignorecase=True) }}"

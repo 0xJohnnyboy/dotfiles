@@ -1,0 +1,27 @@
+---
+# macOS-specific variables
+
+# Package manager
+package_manager: brew
+
+# Build dependencies (installed via Homebrew)
+build_dependencies:
+  - cmake
+  - autoconf
+  - automake
+  - pkg-config
+  - gettext
+  - libtool
+  - wget
+  - curl
+
+# macOS tools
+macos_window_manager: aerospace  # aerospace, yabai, or none
+macos_hotkey_daemon: skhd
+macos_status_bar: sketchybar
+
+# Brewfile location
+brewfile_path: "{{ ansible_user_dir }}/Brewfile"
+
+# Font installation path
+font_install_path: "{{ ansible_user_dir }}/Library/Fonts"

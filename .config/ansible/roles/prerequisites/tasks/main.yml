@@ -1,0 +1,51 @@
+---
+- name: Install build dependencies (Debian/Ubuntu)
+  apt:
+    name: "{{ build_dependencies_apt }}"
+    state: present
+    update_cache: true
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Install build dependencies (Fedora/RHEL)
+  dnf:
+    name: "{{ build_dependencies_dnf }}"
+    state: present
+  become: true
+  when: ansible_os_family == "RedHat"
+
+- name: Install Xcode Command Line Tools (macOS)
+  command: xcode-select --install
+  register: xcode_install
+  failed_when: false
+  changed_when: xcode_install.rc == 0
+  when: ansible_os_family == "Darwin"
+
+- name: Wait for Xcode installation to complete (macOS)
+  wait_for:
+    path: /Library/Developer/CommandLineTools/usr/bin/git
+    timeout: 600
+  when: ansible_os_family == "Darwin" and xcode_install.changed
+
+- name: Install Homebrew (macOS)
+  shell: |
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  args:
+    creates: /opt/homebrew/bin/brew
+  when: ansible_os_family == "Darwin"
+
+- name: Install build dependencies via Homebrew (macOS)
+  homebrew:
+    name: "{{ build_dependencies }}"
+    state: present
+  when: ansible_os_family == "Darwin"
+
+- name: Verify essential build tools are installed
+  command: "{{ item }} --version"
+  loop:
+    - gcc
+    - make
+    - cmake
+  register: build_tools_check
+  changed_when: false
+  failed_when: false

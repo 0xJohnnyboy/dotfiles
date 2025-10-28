@@ -1,0 +1,56 @@
+---
+- name: Check if git is already installed with correct version
+  command: git --version
+  register: git_check
+  changed_when: false
+  failed_when: false
+
+- name: Display current git version
+  debug:
+    msg: "Current git version: {{ git_check.stdout | default('not installed') }}"
+
+- name: Create temporary build directory
+  file:
+    path: "/tmp/git-build"
+    state: directory
+    mode: '0755'
+  when: git_check.rc != 0 or git_version not in git_check.stdout
+
+- name: Download git source
+  get_url:
+    url: "https://github.com/git/git/archive/refs/tags/v{{ git_version }}.tar.gz"
+    dest: "/tmp/git-build/git-{{ git_version }}.tar.gz"
+    mode: '0644'
+  when: git_check.rc != 0 or git_version not in git_check.stdout
+
+- name: Extract git source
+  unarchive:
+    src: "/tmp/git-build/git-{{ git_version }}.tar.gz"
+    dest: "/tmp/git-build"
+    remote_src: true
+  when: git_check.rc != 0 or git_version not in git_check.stdout
+
+- name: Build and install git
+  shell: |
+    make configure
+    ./configure --prefix={{ install_prefix }}
+    make -j{{ build_threads }}
+    sudo make install
+  args:
+    chdir: "/tmp/git-build/git-{{ git_version }}"
+    creates: "{{ install_prefix }}/bin/git"
+  when: git_check.rc != 0 or git_version not in git_check.stdout
+
+- name: Clean up build directory
+  file:
+    path: "/tmp/git-build"
+    state: absent
+
+- name: Verify git installation
+  command: git --version
+  register: git_verify
+  changed_when: false
+
+- name: Display installed git version
+  debug:
+    msg: "✅ Git {{ git_verify.stdout.split()[2] }} installed successfully"

@@ -1,0 +1,50 @@
+---
+- name: Check if dotfiles repository exists
+  stat:
+    path: "{{ dotfiles_dir }}"
+  register: dotfiles_check
+
+- name: Clone dotfiles repository as bare repo
+  shell: |
+    git clone --bare {{ dotfiles_repo }} {{ dotfiles_dir }}
+  when: not dotfiles_check.stat.exists
+
+- name: Backup existing dotfiles if they exist
+  shell: |
+    mkdir -p {{ ansible_user_dir }}/.dotfiles-backup
+    /usr/bin/git --git-dir={{ dotfiles_dir }} --work-tree={{ dotfiles_work_tree }} checkout 2>&1 | \
+    grep -E "^\s+" | awk '{print $1}' | \
+    xargs -I{} mv {{ dotfiles_work_tree }}/{} {{ ansible_user_dir }}/.dotfiles-backup/{}
+  args:
+    executable: /bin/bash
+  register: backup_result
+  failed_when: false
+  changed_when: backup_result.rc == 0
+
+- name: Checkout dotfiles
+  shell: |
+    /usr/bin/git --git-dir={{ dotfiles_dir }} --work-tree={{ dotfiles_work_tree }} checkout main
+  args:
+    executable: /bin/bash
+
+- name: Configure dotfiles repository to not show untracked files
+  shell: |
+    /usr/bin/git --git-dir={{ dotfiles_dir }} --work-tree={{ dotfiles_work_tree }} config status.showUntrackedFiles no
+
+- name: Verify dotfiles alias is configured in .zshrc
+  lineinfile:
+    path: "{{ dotfiles_work_tree }}/.zshrc"
+    regexp: '^alias dotfiles='
+    line: 'alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"'
+    state: present
+
+- name: Display dotfiles setup completion
+  debug:
+    msg: |
+      ✅ Dotfiles configured successfully
+
+      Use 'dotfiles' alias to manage your dotfiles:
+        dotfiles status
+        dotfiles add .config/nvim/init.lua
+        dotfiles commit -m "update nvim config"
+        dotfiles push

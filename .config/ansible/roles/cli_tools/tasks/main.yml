@@ -1,0 +1,116 @@
+---
+- name: Install CLI tools via package manager (Debian/Ubuntu)
+  apt:
+    name:
+      - ripgrep
+      - fd-find
+      - bat
+      - jq
+      - htop
+      - ncdu
+      - tree
+      - wget
+      - curl
+      - unzip
+      - zip
+    state: present
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Install CLI tools via Homebrew (macOS)
+  homebrew:
+    name:
+      - ripgrep
+      - fd
+      - bat
+      - eza
+      - git-delta
+      - lazygit
+      - gh
+      - jq
+      - yq
+      - htop
+      - btop
+      - ncdu
+      - duf
+      - tree
+      - fzf
+    state: present
+  when: ansible_os_family == "Darwin"
+
+- name: Install eza (modern ls replacement) - Debian/Ubuntu
+  block:
+    - name: Add eza gpg key
+      apt_key:
+        url: https://raw.githubusercontent.com/eza-community/eza/main/deb.asc
+        state: present
+      become: true
+
+    - name: Add eza repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/gierens.gpg] http://deb.gierens.de stable main"
+        state: present
+      become: true
+
+    - name: Install eza
+      apt:
+        name: eza
+        state: present
+        update_cache: true
+      become: true
+  when: ansible_os_family == "Debian"
+
+- name: Install fzf
+  git:
+    repo: https://github.com/junegunn/fzf.git
+    dest: "{{ ansible_user_dir }}/.fzf"
+    depth: 1
+  register: fzf_install
+
+- name: Install fzf binaries
+  shell: |
+    {{ ansible_user_dir }}/.fzf/install --all --no-bash --no-fish
+  when: fzf_install.changed
+
+- name: Install GitHub CLI (gh) - Debian/Ubuntu
+  block:
+    - name: Add GitHub CLI repository key
+      shell: |
+        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+        sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+      args:
+        creates: /usr/share/keyrings/githubcli-archive-keyring.gpg
+
+    - name: Add GitHub CLI repository
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+        state: present
+      become: true
+
+    - name: Install gh
+      apt:
+        name: gh
+        state: present
+        update_cache: true
+      become: true
+  when: ansible_os_family == "Debian"
+
+- name: Install lazygit - Debian/Ubuntu
+  block:
+    - name: Add lazygit PPA
+      apt_repository:
+        repo: ppa:lazygit-team/release
+        state: present
+      become: true
+
+    - name: Install lazygit
+      apt:
+        name: lazygit
+        state: present
+        update_cache: true
+      become: true
+  when: ansible_os_family == "Debian"
+
+- name: Display CLI tools installation completion
+  debug:
+    msg: "✅ CLI tools installed successfully"

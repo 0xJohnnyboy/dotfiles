@@ -1,0 +1,74 @@
+---
+# =============================================================================
+# Version Pinning
+# =============================================================================
+git_version: "2.47.0"
+neovim_version: "0.10.2"
+go_version: "1.22.5"
+node_lts_version: "20"
+rust_version: "stable"
+
+# =============================================================================
+# Repository Settings
+# =============================================================================
+dotfiles_repo: "git@github.com:0xJohnnyboy/dotfiles.git"
+dotfiles_dir: "{{ ansible_user_dir }}/.dotfiles"
+dotfiles_work_tree: "{{ ansible_user_dir }}"
+
+# =============================================================================
+# Font Settings
+# =============================================================================
+nerd_font_name: "JetBrainsMono"
+nerd_font_version: "3.2.1"
+
+# =============================================================================
+# Feature Flags
+# =============================================================================
+install_docker: true
+install_macos_tools: true  # Only applies on macOS (aerospace, skhd, sketchybar)
+install_languages: true
+build_from_source: true  # If false, use package managers where possible
+
+# =============================================================================
+# Build Settings
+# =============================================================================
+build_threads: "{{ ansible_processor_vcpus }}"
+install_prefix: "/usr/local"
+
+# =============================================================================
+# CLI Tools to Install
+# =============================================================================
+cli_tools:
+  - ripgrep
+  - fzf
+  - fd-find
+  - bat
+  - eza
+  - git-delta
+  - lazygit
+  - gh  # GitHub CLI
+  - jq
+  - yq
+  - htop
+  - ncdu
+  - duf
+  - tree
+  - wget
+  - curl
+  - unzip
+  - zip
+
+# =============================================================================
+# Language Servers
+# =============================================================================
+language_servers:
+  go:
+    - gopls
+    - delve
+  rust:
+    - rust-analyzer
+  typescript:
+    - typescript-language-server
+    - "@angular/language-server"
+  lua:
+    - lua-language-server

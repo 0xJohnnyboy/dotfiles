@@ -1,0 +1,102 @@
+---
+- name: Install zsh (Debian/Ubuntu)
+  apt:
+    name: zsh
+    state: present
+  become: true
+  when: ansible_os_family == "Debian"
+
+- name: Install zsh (Fedora/RHEL)
+  dnf:
+    name: zsh
+    state: present
+  become: true
+  when: ansible_os_family == "RedHat"
+
+- name: Install zsh (macOS)
+  homebrew:
+    name: zsh
+    state: present
+  when: ansible_os_family == "Darwin"
+
+- name: Check if oh-my-zsh is installed
+  stat:
+    path: "{{ ansible_user_dir }}/.oh-my-zsh"
+  register: ohmyzsh_check
+
+- name: Install oh-my-zsh
+  shell: |
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  when: not ohmyzsh_check.stat.exists
+
+- name: Check if starship is installed
+  command: starship --version
+  register: starship_check
+  changed_when: false
+  failed_when: false
+
+- name: Install starship
+  shell: |
+    curl -sS https://starship.rs/install.sh | sh -s -- -y
+  when: starship_check.rc != 0
+
+- name: Install JetBrainsMono Nerd Font (macOS)
+  block:
+    - name: Download JetBrainsMono Nerd Font
+      get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ nerd_font_version }}/{{ nerd_font_name }}.zip"
+        dest: "/tmp/{{ nerd_font_name }}.zip"
+        mode: '0644'
+
+    - name: Extract font to fonts directory
+      unarchive:
+        src: "/tmp/{{ nerd_font_name }}.zip"
+        dest: "{{ font_install_path }}"
+        remote_src: true
+
+    - name: Clean up font download
+      file:
+        path: "/tmp/{{ nerd_font_name }}.zip"
+        state: absent
+  when: ansible_os_family == "Darwin"
+
+- name: Install JetBrainsMono Nerd Font (Linux)
+  block:
+    - name: Ensure fonts directory exists
+      file:
+        path: "{{ font_install_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Download JetBrainsMono Nerd Font
+      get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ nerd_font_version }}/{{ nerd_font_name }}.zip"
+        dest: "/tmp/{{ nerd_font_name }}.zip"
+        mode: '0644'
+
+    - name: Extract font to fonts directory
+      unarchive:
+        src: "/tmp/{{ nerd_font_name }}.zip"
+        dest: "{{ font_install_path }}"
+        remote_src: true
+
+    - name: Update font cache
+      command: fc-cache -f -v
+      changed_when: false
+
+    - name: Clean up font download
+      file:
+        path: "/tmp/{{ nerd_font_name }}.zip"
+        state: absent
+  when: ansible_os_family != "Darwin"
+
+- name: Set zsh as default shell
+  user:
+    name: "{{ ansible_user_id }}"
+    shell: /bin/zsh
+  become: true
+  when: ansible_user_shell != "/bin/zsh"
+
+- name: Display shell setup completion
+  debug:
+    msg: "✅ Shell environment configured (zsh + oh-my-zsh + starship)"

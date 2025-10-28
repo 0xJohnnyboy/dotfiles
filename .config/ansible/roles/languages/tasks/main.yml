@@ -1,0 +1,170 @@
+---
+# =============================================================================
+# Programming Languages Installation
+# =============================================================================
+
+# =============================================================================
+# Go Installation
+# =============================================================================
+- name: Check if Go is already installed
+  command: go version
+  register: go_installed
+  failed_when: false
+  changed_when: false
+
+- name: Download Go
+  get_url:
+    url: "https://go.dev/dl/go{{ go_version }}.{{ ansible_system | lower }}-{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}.tar.gz"
+    dest: "/tmp/go{{ go_version }}.tar.gz"
+  when: go_installed.rc != 0
+
+- name: Remove old Go installation
+  file:
+    path: /usr/local/go
+    state: absent
+  become: true
+  when: go_installed.rc != 0
+
+- name: Extract Go
+  unarchive:
+    src: "/tmp/go{{ go_version }}.tar.gz"
+    dest: /usr/local
+    remote_src: yes
+  become: true
+  when: go_installed.rc != 0
+
+- name: Install Go language servers (gopls, delve)
+  command: "go install {{ item }}"
+  loop:
+    - golang.org/x/tools/gopls@latest
+    - github.com/go-delve/delve/cmd/dlv@latest
+  environment:
+    PATH: "/usr/local/go/bin:{{ ansible_env.PATH }}"
+    GOPATH: "{{ ansible_user_dir }}/go"
+  when: go_installed.rc != 0
+  ignore_errors: yes
+
+# =============================================================================
+# Node.js Installation (via nvm)
+# =============================================================================
+- name: Check if nvm is installed
+  stat:
+    path: "{{ ansible_user_dir }}/.nvm/nvm.sh"
+  register: nvm_installed
+
+- name: Download nvm installer
+  get_url:
+    url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh
+    dest: /tmp/nvm_install.sh
+    mode: '0755'
+  when: not nvm_installed.stat.exists
+
+- name: Install nvm
+  shell: bash /tmp/nvm_install.sh
+  when: not nvm_installed.stat.exists
+
+- name: Install Node.js LTS via nvm
+  shell: |
+    export NVM_DIR="{{ ansible_user_dir }}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm install {{ node_lts_version }}
+    nvm alias default {{ node_lts_version }}
+    nvm use {{ node_lts_version }}
+  args:
+    executable: /bin/bash
+  when: not nvm_installed.stat.exists
+
+- name: Install Node.js language servers
+  shell: |
+    export NVM_DIR="{{ ansible_user_dir }}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm use {{ node_lts_version }}
+    npm install -g {{ item }}
+  args:
+    executable: /bin/bash
+  loop:
+    - typescript-language-server
+    - typescript
+    - "@angular/language-server"
+  ignore_errors: yes
+
+# =============================================================================
+# Rust Installation (via rustup)
+# =============================================================================
+- name: Check if rustup is installed
+  command: rustup --version
+  register: rustup_installed
+  failed_when: false
+  changed_when: false
+
+- name: Download rustup installer
+  get_url:
+    url: https://sh.rustup.rs
+    dest: /tmp/rustup.sh
+    mode: '0755'
+  when: rustup_installed.rc != 0
+
+- name: Install Rust via rustup
+  shell: sh /tmp/rustup.sh -y --default-toolchain {{ rust_version }}
+  when: rustup_installed.rc != 0
+
+- name: Install rust-analyzer
+  shell: |
+    source {{ ansible_user_dir }}/.cargo/env
+    rustup component add rust-analyzer
+  args:
+    executable: /bin/bash
+  when: rustup_installed.rc != 0
+  ignore_errors: yes
+
+# =============================================================================
+# Lua Language Server
+# =============================================================================
+- name: Install lua-language-server (macOS)
+  homebrew:
+    name: lua-language-server
+    state: present
+  when: ansible_os_family == "Darwin"
+  become: false
+
+- name: Install lua-language-server (Linux)
+  shell: |
+    export NVM_DIR="{{ ansible_user_dir }}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm use {{ node_lts_version }}
+    npm install -g lua-language-server
+  args:
+    executable: /bin/bash
+  when: ansible_os_family != "Darwin"
+  ignore_errors: yes
+
+- name: Display languages installation status
+  debug:
+    msg: |
+      Programming languages installed successfully!
+
+      Go {{ go_version }}:
+        - Installed to /usr/local/go
+        - gopls (language server)
+        - delve (debugger)
+
+      Node.js {{ node_lts_version }} (via nvm):
+        - nvm installed to ~/.nvm
+        - typescript-language-server
+        - @angular/language-server
+
+      Rust {{ rust_version }} (via rustup):
+        - rustup installed to ~/.cargo
+        - rust-analyzer
+
+      Lua:
+        - lua-language-server
+
+      Add to PATH in your shell config:
+        export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
+        export PATH="$HOME/.cargo/bin:$PATH"
+
+      Verify installations:
+        go version
+        node --version
+        cargo --version

@@ -1,0 +1,117 @@
+---
+# =============================================================================
+# macOS-Specific Tools Installation
+# =============================================================================
+
+- name: Ensure this only runs on macOS
+  fail:
+    msg: "This role is only for macOS (Darwin)"
+  when: ansible_os_family != "Darwin"
+
+- name: Check if Homebrew is installed
+  stat:
+    path: /opt/homebrew/bin/brew
+  register: homebrew_check
+
+- name: Install Homebrew
+  shell: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  when: not homebrew_check.stat.exists
+
+- name: Add Homebrew to PATH for this session
+  set_fact:
+    ansible_env: "{{ ansible_env | combine({'PATH': '/opt/homebrew/bin:' + ansible_env.PATH}) }}"
+  when: not homebrew_check.stat.exists
+
+# =============================================================================
+# Install macOS Window Manager and Tools
+# =============================================================================
+
+- name: Install aerospace (tiling window manager)
+  homebrew:
+    name: nikitabobko/tap/aerospace
+    state: present
+  when: macos_window_manager == "aerospace"
+  become: false
+
+- name: Install ice bar (menu bar manager)
+  homebrew:
+    name: jordanbaird-ice
+    state: present
+  when: macos_menu_bar == "ice"
+  become: false
+
+# =============================================================================
+# Install from Brewfile
+# =============================================================================
+
+- name: Check if Brewfile exists
+  stat:
+    path: "{{ brewfile_path }}"
+  register: brewfile_exists
+
+- name: Install packages from Brewfile
+  shell: brew bundle --file="{{ brewfile_path }}"
+  args:
+    chdir: "{{ ansible_user_dir }}"
+  when: brewfile_exists.stat.exists
+  ignore_errors: yes
+
+# =============================================================================
+# Apply aerospace configuration
+# =============================================================================
+
+- name: Ensure aerospace config directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.config/aerospace"
+    state: directory
+    mode: '0755'
+
+- name: Check if aerospace config exists in dotfiles
+  stat:
+    path: "{{ ansible_user_dir }}/.config/aerospace/aerospace.toml"
+  register: aerospace_config
+
+- name: Display aerospace status
+  debug:
+    msg: |
+      aerospace config found at ~/.config/aerospace/aerospace.toml
+      Configuration already in place from dotfiles.
+  when: aerospace_config.stat.exists
+
+# =============================================================================
+# Start Services
+# =============================================================================
+
+- name: Start aerospace
+  command: aerospace reload-config
+  when: macos_window_manager == "aerospace" and aerospace_config.stat.exists
+  ignore_errors: yes
+
+- name: Display macOS tools installation status
+  debug:
+    msg: |
+      macOS-specific tools installed successfully!
+
+      ✅ Homebrew: Installed
+      {% if macos_window_manager == "aerospace" %}
+      ✅ AeroSpace: Tiling window manager
+         - Config: ~/.config/aerospace/aerospace.toml
+         - Reload config: aerospace reload-config
+         - Start at login enabled
+      {% endif %}
+      {% if macos_menu_bar == "ice" %}
+      ✅ Ice Bar: Menu bar manager
+         - Launch Ice from Applications
+         - Configure via menu bar icon
+      {% endif %}
+      {% if brewfile_exists.stat.exists %}
+      ✅ Brewfile packages installed from {{ brewfile_path }}
+      {% endif %}
+
+      Next steps:
+      1. Launch Ice Bar from Applications
+      2. Configure Ice Bar settings (hide menu bar items, etc.)
+      3. AeroSpace is running and managing windows
+      4. Use Cmd+1, Cmd+2, etc. to switch workspaces
+
+      Your macOS development environment is ready! 🚀

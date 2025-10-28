@@ -1,0 +1,97 @@
+---
+# =============================================================================
+# WezTerm Installation
+# =============================================================================
+
+- name: Install WezTerm (macOS)
+  homebrew_cask:
+    name: wezterm
+    state: present
+  when: ansible_os_family == "Darwin"
+  become: false
+
+- name: Check if WezTerm is already installed (Linux)
+  stat:
+    path: /usr/local/bin/wezterm
+  register: wezterm_installed
+  when: ansible_os_family != "Darwin"
+
+- name: Get latest WezTerm release info (Linux)
+  uri:
+    url: https://api.github.com/repos/wez/wezterm/releases/latest
+    return_content: yes
+  register: wezterm_release
+  when: ansible_os_family != "Darwin" and not wezterm_installed.stat.exists
+
+- name: Download WezTerm AppImage (Linux)
+  get_url:
+    url: "https://github.com/wez/wezterm/releases/latest/download/WezTerm-{{ wezterm_release.json.tag_name }}-Ubuntu20.04.AppImage"
+    dest: "/tmp/wezterm.appimage"
+    mode: '0755'
+  when: ansible_os_family != "Darwin" and not wezterm_installed.stat.exists and not is_wsl
+
+- name: Install WezTerm AppImage (Linux)
+  copy:
+    src: /tmp/wezterm.appimage
+    dest: /usr/local/bin/wezterm
+    mode: '0755'
+    remote_src: yes
+  become: true
+  when: ansible_os_family != "Darwin" and not wezterm_installed.stat.exists and not is_wsl
+
+- name: Download WezTerm .deb package (Ubuntu/Debian/WSL)
+  get_url:
+    url: "https://github.com/wez/wezterm/releases/latest/download/wezterm-{{ wezterm_release.json.tag_name }}-Ubuntu20.04.deb"
+    dest: "/tmp/wezterm.deb"
+  when: ansible_os_family == "Debian" and not wezterm_installed.stat.exists
+
+- name: Install WezTerm .deb package (Ubuntu/Debian/WSL)
+  apt:
+    deb: /tmp/wezterm.deb
+    state: present
+  become: true
+  when: ansible_os_family == "Debian" and not wezterm_installed.stat.exists
+
+- name: Install Nerd Fonts (macOS)
+  homebrew:
+    name:
+      - font-jetbrains-mono-nerd-font
+      - font-hack-nerd-font
+    state: present
+  when: ansible_os_family == "Darwin"
+  become: false
+
+- name: Ensure fonts directory exists (Linux)
+  file:
+    path: "{{ font_install_path }}"
+    state: directory
+    mode: '0755'
+  when: ansible_os_family != "Darwin"
+
+- name: Download JetBrainsMono Nerd Font (Linux)
+  get_url:
+    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ nerd_font_version }}/JetBrainsMono.zip"
+    dest: "/tmp/JetBrainsMono.zip"
+  when: ansible_os_family != "Darwin"
+
+- name: Extract JetBrainsMono Nerd Font (Linux)
+  unarchive:
+    src: "/tmp/JetBrainsMono.zip"
+    dest: "{{ font_install_path }}"
+    remote_src: yes
+  when: ansible_os_family != "Darwin"
+
+- name: Update font cache (Linux)
+  command: fc-cache -fv
+  when: ansible_os_family != "Darwin"
+
+- name: Display WezTerm installation status
+  debug:
+    msg: |
+      WezTerm terminal emulator installed successfully!
+      JetBrainsMono Nerd Font installed.
+
+      Your wezterm.lua config is already in place from dotfiles.
+      It includes cross-platform OS detection for macOS, Linux, and WSL.
+
+      Launch WezTerm and enjoy!

@@ -1,0 +1,115 @@
+---
+# =============================================================================
+# Docker Installation
+# =============================================================================
+
+- name: Install Docker Desktop (macOS)
+  homebrew_cask:
+    name: docker
+    state: present
+  when: ansible_os_family == "Darwin"
+  become: false
+
+# Debian/Ubuntu Docker installation
+- name: Install Docker prerequisites (Debian/Ubuntu)
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+  become: true
+
+- name: Add Docker GPG key (Debian/Ubuntu)
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  when: ansible_os_family == "Debian"
+  become: true
+
+- name: Add Docker repository (Debian/Ubuntu)
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  when: ansible_os_family == "Debian" and not is_wsl
+  become: true
+
+- name: Install Docker Engine (Debian/Ubuntu)
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian" and not is_wsl
+  become: true
+
+# WSL Docker note
+- name: Display WSL Docker note
+  debug:
+    msg: |
+      ⚠️  Running on WSL detected.
+
+      For WSL, it's recommended to use Docker Desktop for Windows.
+      Alternatively, you can install Docker Engine in WSL2.
+
+      Skipping Docker installation on WSL.
+  when: is_wsl
+
+# Fedora/RHEL Docker installation
+- name: Install Docker (Fedora/RHEL)
+  dnf:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+  when: ansible_os_family == "RedHat"
+  become: true
+
+- name: Start and enable Docker service (Linux)
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+  when: ansible_os_family != "Darwin" and not is_wsl
+  become: true
+
+- name: Add user to docker group (Linux)
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: docker
+    append: yes
+  when: ansible_os_family != "Darwin" and not is_wsl
+  become: true
+
+- name: Display Docker installation status
+  debug:
+    msg: |
+      Docker installed successfully!
+
+      {% if ansible_os_family == "Darwin" %}
+      Docker Desktop installed via Homebrew.
+      Start Docker Desktop from Applications.
+      {% elif is_wsl %}
+      For WSL, use Docker Desktop for Windows or install Docker Engine manually.
+      {% else %}
+      Docker Engine installed.
+      User added to docker group (logout/login required to take effect).
+
+      Verify installation:
+        docker --version
+        docker compose version
+
+      Test Docker:
+        docker run hello-world
+      {% endif %}

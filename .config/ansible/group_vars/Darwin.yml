@@ -15,10 +15,9 @@ build_dependencies:
   - wget
   - curl
 
-# macOS tools
-macos_window_manager: aerospace  # aerospace, yabai, or none
-macos_hotkey_daemon: skhd
-macos_status_bar: sketchybar
+# macOS tools (updated 2024)
+macos_window_manager: aerospace  # Tiling window manager
+macos_menu_bar: ice  # Ice Bar (menu bar manager)
 
 # Brewfile location
 brewfile_path: "{{ ansible_user_dir }}/Brewfile"

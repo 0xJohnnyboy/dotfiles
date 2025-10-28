@@ -1,0 +1,70 @@
+---
+# =============================================================================
+# tmux Installation and Configuration
+# =============================================================================
+
+- name: Install tmux (macOS)
+  homebrew:
+    name: tmux
+    state: present
+  when: ansible_os_family == "Darwin"
+  become: false
+
+- name: Install tmux (Debian/Ubuntu)
+  apt:
+    name: tmux
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+  become: true
+
+- name: Install tmux (Fedora/RHEL)
+  dnf:
+    name: tmux
+    state: present
+  when: ansible_os_family == "RedHat"
+  become: true
+
+- name: Ensure tmux config directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.config/tmux"
+    state: directory
+    mode: '0755'
+
+- name: Ensure tmux plugins directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.config/tmux/plugins"
+    state: directory
+    mode: '0755'
+
+- name: Clone TPM (Tmux Plugin Manager)
+  git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: "{{ ansible_user_dir }}/.config/tmux/plugins/tpm"
+    version: master
+    update: yes
+  ignore_errors: yes
+
+- name: Ensure tmux resurrect directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.config/tmux/resurrect"
+    state: directory
+    mode: '0755'
+
+- name: Check if tmux is running
+  command: pgrep tmux
+  register: tmux_running
+  failed_when: false
+  changed_when: false
+
+- name: Display tmux installation status
+  debug:
+    msg: |
+      tmux installed successfully!
+      TPM (Tmux Plugin Manager) installed to ~/.config/tmux/plugins/tpm
+
+      To install tmux plugins:
+      1. Start tmux: tmux
+      2. Press prefix + I (Ctrl+Space then I) to install plugins
+
+      Your tmux.conf is already in place from dotfiles.

@@ -165,8 +165,10 @@ Debugging is configured using nvim-dap with nvim-dap-go adapter and nvim-dap-ui 
 ### Debug Keybindings
 
 **Breakpoints:**
-- `<leader>db`: Toggle breakpoint at current line
-- `<leader>dB`: Set conditional breakpoint
+- `<leader>db`: Toggle breakpoint at current line (persistent)
+- `<leader>dB`: Set conditional breakpoint (persistent)
+- `<leader>dL`: List all breakpoints (Telescope)
+- `<leader>dx`: Clear all breakpoints
 
 **Execution Control:**
 - `<leader>dc`: Continue/Start debugging
@@ -178,11 +180,26 @@ Debugging is configured using nvim-dap with nvim-dap-go adapter and nvim-dap-ui 
 **Interface:**
 - `<leader>du`: Toggle DAP UI
 - `<leader>dr`: Open REPL
+- `<leader>dv`: View variables (Telescope)
+- `<leader>df`: View stack frames (Telescope)
+- `<leader>dC`: List DAP commands (Telescope)
 
 **Go-specific:**
 - `<leader>dg`: Debug nearest Go test (using treesitter)
 - `<leader>dG`: Debug last Go test
 - `<leader>td`: Debug nearest test via neotest
+
+### Breakpoint Management
+
+Breakpoints are **persistent** across Neovim sessions, stored in `~/.local/share/nvim/data/breakpoints/`.
+
+**Managing breakpoints:**
+1. **List view**: Press `<leader>dL` to open Telescope with all breakpoints
+   - Navigate with `j`/`k`, jump to breakpoint with `<Enter>`
+   - Delete individual breakpoints with `<C-d>` in the picker
+2. **DAP UI panel**: The left panel shows breakpoints when debugging
+3. **Clear all**: Press `<leader>dx` to remove all breakpoints at once
+4. **File-based**: Breakpoints are stored per-project in JSON format
 
 ### DAP UI
 
@@ -258,10 +275,14 @@ Treesitter uses the `main` branch (required for neotest-golang v2+), which has a
 
 ### Debugging (Go)
 - `<leader>db`: Set breakpoint
+- `<leader>dL`: List all breakpoints (manage in Telescope)
+- `<leader>dx`: Clear all breakpoints
 - `<leader>dc`: Start/continue debugging
 - `<leader>di`/`do`/`dO`: Step into/over/out
 - `<leader>dg`: Debug nearest Go test
 - `<leader>du`: Toggle debug UI
+- `<leader>dv`: View variables
+- `<leader>df`: View stack frames
 
 ### Working with REST APIs
 - Open .http or .rest file

@@ -91,11 +91,12 @@ All keymaps are documented and organized into groups:
 |--------|-------|----------|
 | `<leader>b` | Buffer | `bd` close, `bn` next, `bp` prev |
 | `<leader>c` | Comment | `cl` line, `cb` block |
+| `<leader>d` | Debug (DAP) | `db` breakpoint, `dc` continue, `di` step into |
 | `<leader>e` | Fern explorer | `ee` toggle, `es` show current |
 | `<leader>f` | Find (Telescope) | `ff` files, `fs` symbols, `ft` todos |
 | `<leader>p` | Project | `pf` git files, `ps` live grep, `pt` explorer |
 | `<leader>s` | Scretch | `sn` new, `sl` last, `ss` search |
-| `<leader>t` | Test (Neotest) | `tr` run nearest, `tf` file, `ta` all |
+| `<leader>t` | Test (Neotest) | `tr` run nearest, `tf` file, `ta` all, `td` debug |
 | `<leader>x` | Trouble diagnostics | `xx` toggle, `xd` document |
 | `<leader>Gf` | Grug-far (find/replace) | Opens find/replace UI |
 | `<leader>R` | REST client (Kulala) | `Rs` send, `Ra` send all |
@@ -157,6 +158,49 @@ The configuration uses `gotestsum` (installed via build hook in lua/plugins/neot
 - Tests must follow Go naming conventions (`*_test.go` files, `TestXxx` functions)
 - CGO_ENABLED is required for `-race` flag (currently disabled)
 
+## Debugging (Go-specific)
+
+Debugging is configured using nvim-dap with nvim-dap-go adapter and nvim-dap-ui for visual interface:
+
+### Debug Keybindings
+
+**Breakpoints:**
+- `<leader>db`: Toggle breakpoint at current line
+- `<leader>dB`: Set conditional breakpoint
+
+**Execution Control:**
+- `<leader>dc`: Continue/Start debugging
+- `<leader>di`: Step into function
+- `<leader>do`: Step over line
+- `<leader>dO`: Step out of function
+- `<leader>dt`: Terminate debug session
+
+**Interface:**
+- `<leader>du`: Toggle DAP UI
+- `<leader>dr`: Open REPL
+
+**Go-specific:**
+- `<leader>dg`: Debug nearest Go test (using treesitter)
+- `<leader>dG`: Debug last Go test
+- `<leader>td`: Debug nearest test via neotest
+
+### DAP UI
+
+The DAP UI automatically opens when a debug session starts and closes when it ends. It provides:
+- **Left panel**: Scopes, breakpoints, stacks, watches
+- **Bottom panel**: REPL and console output
+
+### Neotest Integration
+
+DAP is integrated with neotest-golang, allowing you to debug tests directly from neotest:
+- Use `<leader>td` to debug the nearest test with full DAP support
+- Breakpoints work seamlessly with test debugging
+
+**Requirements**:
+- Delve debugger (`go install github.com/go-delve/delve/cmd/dlv@latest`)
+- nvim-dap, nvim-dap-go, and nvim-dap-ui plugins
+- `dap_go_enabled = true` in neotest-golang configuration
+
 ## Important Settings
 
 From init.lua:
@@ -210,6 +254,14 @@ Treesitter uses the `main` branch (required for neotest-golang v2+), which has a
 - `<leader>tr`: Run nearest test
 - `<leader>tf`: Run current file tests
 - `<leader>ta`: Run all tests
+- `<leader>td`: Debug nearest test
+
+### Debugging (Go)
+- `<leader>db`: Set breakpoint
+- `<leader>dc`: Start/continue debugging
+- `<leader>di`/`do`/`dO`: Step into/over/out
+- `<leader>dg`: Debug nearest Go test
+- `<leader>du`: Toggle debug UI
 
 ### Working with REST APIs
 - Open .http or .rest file

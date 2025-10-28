@@ -10,6 +10,8 @@ return {
         "nvim-lua/plenary.nvim",
         "antoinemadec/FixCursorHold.nvim",
         "nvim-treesitter/nvim-treesitter",
+        "mfussenegger/nvim-dap",
+        "leoluz/nvim-dap-go",
         {
             "fredrikaverpil/neotest-golang",
             version = "*",
@@ -37,6 +39,7 @@ return {
                 require("neotest-golang")({
                     runner = "gotestsum",
                     go_test_args = { "-v", "-count=1" },
+                    dap_go_enabled = true,
                 }),
             },
         })

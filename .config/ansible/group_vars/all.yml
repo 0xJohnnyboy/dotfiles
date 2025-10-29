@@ -25,7 +25,7 @@ nerd_font_version: "3.2.1"
 # Feature Flags
 # =============================================================================
 install_docker: true
-install_macos_tools: true  # Only applies on macOS (aerospace, skhd, sketchybar)
+install_macos_tools: true  # Only applies on macOS (aerospace, ice bar)
 install_languages: true
 build_from_source: true  # If false, use package managers where possible
 

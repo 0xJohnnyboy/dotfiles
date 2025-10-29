@@ -406,7 +406,7 @@ build_from_source: true  # If false, use package managers
 
 **Estimated Time**: 8-12 hours
 
-### Phase 4: Bootstrap Script
+### Phase 4: Bootstrap Script ✅ COMPLETED
 
 **Goal**: Create curl-able install.sh that sets up everything
 
@@ -447,9 +447,18 @@ git --git-dir=.dotfiles --work-tree=. checkout
 ./install.sh
 ```
 
-**Estimated Time**: 3-4 hours
+**Actual Time**: Completed
 
-### Phase 5: Documentation Updates
+✅ Bootstrap script created at ~/install.sh
+✅ Cross-platform OS detection (macOS, Linux, WSL)
+✅ Automatic prerequisite installation
+✅ Dotfiles cloning as bare repository
+✅ Ansible playbook execution
+✅ Command-line flags implemented: --dry-run, --minimal, --tags, --skip-ansible
+✅ Standardized dotfiles path to ~/.dotfiles
+✅ One-command installation working
+
+### Phase 5: Documentation Updates 🔄 IN PROGRESS
 
 **Goal**: Update all documentation to reflect new architecture
 

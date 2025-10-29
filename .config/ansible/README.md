@@ -62,7 +62,7 @@ ansible-playbook playbook.yml --tags "git,neovim,cli"
 | `golang` | Go language and tools |
 | `nodejs` | Node.js via nvm |
 | `rust` | Rust via rustup |
-| `macos` | macOS-specific tools (aerospace, skhd, etc.) |
+| `macos` | macOS-specific tools (aerospace, ice bar, etc.) |
 | `dotfiles` | Apply dotfiles configuration |
 
 ### Dry Run
@@ -134,9 +134,8 @@ build_from_source: true      # Build git/nvim from source vs packages
 
 macOS settings in `group_vars/Darwin.yml`:
 ```yaml
-macos_window_manager: aerospace  # or yabai, or none
-macos_hotkey_daemon: skhd
-macos_status_bar: sketchybar
+macos_window_manager: aerospace  # Tiling window manager
+macos_menu_bar: ice  # Ice Bar (menu bar manager)
 ```
 
 Linux settings in `group_vars/Linux.yml`:
@@ -256,8 +255,7 @@ ansible-playbook playbook.yml --tags neovim -vvv
 
 - **Homebrew** (package manager)
 - **aerospace** (tiling window manager)
-- **skhd** (hotkey daemon)
-- **sketchybar** (status bar)
+- **ice bar** (menu bar manager)
 
 ## Maintenance
 

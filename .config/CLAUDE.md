@@ -14,14 +14,24 @@ The `dotfiles` alias in `.zshrc` provides git commands for this repository. This
 ## Repository Structure
 
 ```
-~/.config/
-├── nvim/              # Neovim configuration (lazy.nvim + native LSP)
-├── tmux/              # tmux configuration (TPM plugins)
-├── wezterm/           # WezTerm terminal emulator config
-├── git/               # Git global ignore patterns
-├── starship.toml      # Starship prompt configuration
-├── install.sh         # Bootstrap script for macOS setup
-└── [other tools]/     # Additional tool configs (htop, neofetch, etc.)
+~/
+├── install.sh                    # Bootstrap script (curl-able, cross-platform)
+├── .zshrc                        # Shell config with OS detection
+├── .config/
+│   ├── CLAUDE.md                # This file
+│   ├── PROJECT_PLAN.md          # Refactoring plan and progress
+│   ├── nvim/                    # Neovim configuration (lazy.nvim + native LSP)
+│   ├── tmux/                    # tmux configuration (TPM plugins)
+│   ├── wezterm/                 # WezTerm terminal emulator (cross-platform)
+│   ├── aerospace/               # macOS tiling window manager
+│   ├── git/                     # Git global ignore patterns
+│   ├── starship.toml            # Starship prompt configuration
+│   ├── ansible/                 # Ansible automation (NEW!)
+│   │   ├── playbook.yml
+│   │   ├── group_vars/
+│   │   └── roles/              # 11 roles for automated setup
+│   └── [other tools]/          # Additional tool configs (htop, neofetch, etc.)
+└── .dotfiles/                   # Bare git repository
 ```
 
 ## Key Configuration Files
@@ -97,25 +107,51 @@ The bare repository is located at `~/.dotfiles/` with work tree at `~` (home dir
 
 ## Installation
 
-### Bootstrap New System (macOS)
+### Quick Start (One-Command Install)
 
-Run the install script:
+Install complete development environment on any platform:
+
 ```bash
-cd ~/.config
-./install.sh
+# One-command installation (macOS, Linux, WSL)
+curl -fsSL https://raw.githubusercontent.com/0xJohnnyboy/dotfiles/main/install.sh | bash
 ```
 
-This will install:
-- Oh My Zsh
-- Starship prompt
-- NVM (Node Version Manager) + Node.js LTS
-- Homebrew (if not present)
-- Homebrew packages from `~/Brewfile` (if exists)
-- JetBrains Mono Nerd Font
+This automated installer:
+1. Detects OS (macOS, Linux, WSL)
+2. Installs prerequisites (git, python3, ansible)
+3. Clones dotfiles as bare repository to `~/.dotfiles`
+4. Runs Ansible playbook for complete environment setup
 
-**Note**: Debian support is not implemented (exits with "Not supported at the moment").
+**What gets installed:**
+- Git (built from source)
+- Neovim (built from source)
+- tmux + TPM (Tmux Plugin Manager)
+- zsh + oh-my-zsh + Starship prompt
+- WezTerm + Nerd Fonts
+- CLI tools: ripgrep, fzf, fd, bat, eza, lazygit, gh, jq, htop, etc.
+- Docker (Engine on Linux, Desktop on macOS)
+- Go, Node.js (nvm), Rust (rustup) + Language Servers
+- **macOS only**: Homebrew, aerospace, ice bar, Brewfile packages
 
-### Manual Setup
+### Advanced Installation Options
+
+```bash
+# Preview what would be installed (dry-run)
+./install.sh --dry-run
+
+# Minimal installation (shell + CLI tools only)
+./install.sh --minimal
+
+# Install specific components
+./install.sh --tags neovim,tmux,docker
+
+# Clone dotfiles only, skip Ansible
+./install.sh --skip-ansible
+```
+
+For detailed Ansible options, see [ansible/README.md](ansible/README.md).
+
+### Manual Setup (Alternative)
 
 If bootstrap script is not suitable:
 
@@ -259,21 +295,59 @@ When working with specific file types:
 
 ## System Dependencies
 
-Tools that should be installed for full functionality:
+All dependencies are automatically installed via Ansible. The bootstrap script (`install.sh`) handles everything:
 
-- **Core**: git, nvim, tmux, zsh
-- **Shell**: oh-my-zsh, starship
-- **Fonts**: JetBrainsMono Nerd Font or Hack Nerd Font
-- **Node**: nvm + Node.js LTS
-- **Go tooling**: gopls, dlv, gotestsum
-- **Language servers**: Via Mason (`:Mason` in nvim)
-- **CLI utilities**: eza (enhanced ls), ripgrep (rg), fzf (fuzzy finder)
-- **Optional**: docker, helm, various language runtimes
+**Core Tools** (built from source):
+- **git** (latest: 2.47.0)
+- **neovim** (latest: 0.10.2)
+- **tmux** + TPM (Tmux Plugin Manager)
+- **zsh** + oh-my-zsh + starship prompt
+
+**CLI Utilities**:
+- ripgrep (rg), fzf, fd-find, bat, eza
+- lazygit, gh (GitHub CLI), delta (git diff)
+- jq, yq, htop, ncdu, duf, tree
+
+**Terminal & Fonts**:
+- WezTerm terminal emulator
+- JetBrainsMono Nerd Font
+- Hack Nerd Font (fallback)
+
+**Programming Languages** (optional, via `--tags languages`):
+- **Go** (1.22.5): gopls, delve
+- **Node.js** (LTS via nvm): typescript-language-server, @angular/language-server
+- **Rust** (stable via rustup): rust-analyzer
+- **Lua**: lua-language-server
+
+**Containers** (optional, via `--tags docker`):
+- Docker (Engine on Linux, Desktop on macOS)
+
+**macOS-Specific Tools**:
+- Homebrew package manager
+- **aerospace** - Tiling window manager (replaces yabai)
+- **ice bar** - Menu bar manager (replaces sketchybar)
+- Brewfile packages
 
 ## Platform Support
 
-- **macOS**: Primary platform, fully supported by install.sh
-- **Linux**: Configurations work but install.sh not implemented for Debian
-- **Windows/WSL**: Configurations compatible, WezTerm config includes WSL backdrop support
+**Fully supported cross-platform:**
 
-Current environment: Linux on WSL2 (based on uname in env).
+- ✅ **macOS** (Intel & Apple Silicon)
+  - Homebrew-based installation
+  - aerospace tiling window manager
+  - ice bar for menu bar management
+
+- ✅ **Linux** (Debian/Ubuntu, Fedora/RHEL)
+  - apt/dnf package managers
+  - Native Docker Engine
+  - All development tools
+
+- ✅ **WSL** (Windows Subsystem for Linux)
+  - Detected automatically
+  - Special handling for Docker (uses Windows Docker Desktop)
+  - Full Linux tooling
+
+**OS Detection:**
+- Automatic detection in install.sh and .zshrc
+- WezTerm config adapts to platform (blur on macOS, acrylic on WSL)
+- Ansible roles use OS-specific tasks with `when` conditions

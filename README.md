@@ -110,8 +110,8 @@ ansible-playbook playbook.yml
 
 - **Homebrew** - Package manager
 - **aerospace** - Tiling window manager
-- **skhd** - Hotkey daemon
-- **sketchybar** - Custom status bar
+- **ice bar** - Menu bar manager
+- **Dock preferences** - Automated configuration (position, autohide, magnification, etc.)
 
 ## 📁 Repository Structure
 
@@ -212,7 +212,7 @@ ansible-playbook playbook.yml --tags "shell,cli,dotfiles"
 | `golang` | Go only |
 | `nodejs` | Node.js only |
 | `rust` | Rust only |
-| `macos` | macOS tools (aerospace, skhd, sketchybar) |
+| `macos` | macOS tools (aerospace, ice bar, Dock preferences) |
 | `dotfiles` | Apply dotfiles configuration |
 
 ### Customization
@@ -237,12 +237,14 @@ install_languages: true      # Install Go, Node, Rust
 build_from_source: true      # Build vs package manager
 ```
 
-#### macOS Window Manager
+#### macOS Customization
 
 Edit `.config/ansible/group_vars/Darwin.yml`:
 
 ```yaml
-macos_window_manager: aerospace  # aerospace, yabai, or none
+macos_window_manager: aerospace          # Tiling window manager
+macos_menu_bar: ice                      # Menu bar manager
+configure_macos_preferences: true        # Apply Dock and system preferences
 ```
 
 ## 🖥️ Platform Support

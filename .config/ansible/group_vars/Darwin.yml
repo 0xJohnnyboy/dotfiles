@@ -19,6 +19,9 @@ build_dependencies:
 macos_window_manager: aerospace  # Tiling window manager
 macos_menu_bar: ice  # Ice Bar (menu bar manager)
 
+# macOS System Preferences
+configure_macos_preferences: true  # Apply Dock and system settings via defaults
+
 # Brewfile location
 brewfile_path: "{{ ansible_user_dir }}/Brewfile"
 

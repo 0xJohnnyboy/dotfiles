@@ -79,6 +79,102 @@
   when: aerospace_config.stat.exists
 
 # =============================================================================
+# macOS System Preferences (Dock)
+# =============================================================================
+
+- name: Configure Dock preferences
+  block:
+    - name: Set Dock orientation to left
+      osx_defaults:
+        domain: com.apple.dock
+        key: orientation
+        type: string
+        value: left
+      notify: Restart Dock
+
+    - name: Set Dock minimize effect to suck
+      osx_defaults:
+        domain: com.apple.dock
+        key: mineffect
+        type: string
+        value: suck
+      notify: Restart Dock
+
+    - name: Enable Dock autohide
+      osx_defaults:
+        domain: com.apple.dock
+        key: autohide
+        type: int
+        value: 1
+      notify: Restart Dock
+
+    - name: Set Dock autohide delay to 0
+      osx_defaults:
+        domain: com.apple.dock
+        key: autohide-delay
+        type: float
+        value: 0
+      notify: Restart Dock
+
+    - name: Set Dock autohide animation time
+      osx_defaults:
+        domain: com.apple.dock
+        key: autohide-time-modifier
+        type: float
+        value: 1
+      notify: Restart Dock
+
+    - name: Enable Dock magnification
+      osx_defaults:
+        domain: com.apple.dock
+        key: magnification
+        type: int
+        value: 1
+      notify: Restart Dock
+
+    - name: Set Dock tile size
+      osx_defaults:
+        domain: com.apple.dock
+        key: tilesize
+        type: int
+        value: 32
+      notify: Restart Dock
+
+    - name: Set Dock magnified icon size
+      osx_defaults:
+        domain: com.apple.dock
+        key: largesize
+        type: int
+        value: 90
+      notify: Restart Dock
+
+    - name: Hide recent applications in Dock
+      osx_defaults:
+        domain: com.apple.dock
+        key: show-recents
+        type: int
+        value: 0
+      notify: Restart Dock
+
+    - name: Enable App Exposé gesture
+      osx_defaults:
+        domain: com.apple.dock
+        key: showAppExposeGestureEnabled
+        type: int
+        value: 1
+      notify: Restart Dock
+
+    - name: Disable natural scroll direction
+      osx_defaults:
+        domain: NSGlobalDomain
+        key: com.apple.swipescrolldirection
+        type: int
+        value: 0
+      notify: Restart Dock
+
+  when: configure_macos_preferences | default(true)
+
+# =============================================================================
 # Start Services
 # =============================================================================
 
@@ -107,11 +203,21 @@
       {% if brewfile_exists.stat.exists %}
       ✅ Brewfile packages installed from {{ brewfile_path }}
       {% endif %}
+      {% if configure_macos_preferences | default(true) %}
+      ✅ macOS Dock preferences configured:
+         - Position: Left side
+         - Autohide: Enabled
+         - Minimize effect: Suck
+         - Magnification: Enabled (32px → 90px)
+         - Recent apps: Hidden
+         - Natural scroll: Disabled
+      {% endif %}
 
       Next steps:
       1. Launch Ice Bar from Applications
       2. Configure Ice Bar settings (hide menu bar items, etc.)
       3. AeroSpace is running and managing windows
       4. Use Cmd+1, Cmd+2, etc. to switch workspaces
+      5. Dock preferences have been applied (logout/login to see all changes)
 
       Your macOS development environment is ready! 🚀

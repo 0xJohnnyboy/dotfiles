@@ -34,9 +34,21 @@ local is_mac = wezterm.target_triple:find("darwin") ~= nil
 local is_linux = wezterm.target_triple:find("linux") ~= nil and not is_wsl
 
 -- =============================================================================
+-- Theme Detection
+-- =============================================================================
+local function get_appearance()
+  if wezterm.gui then
+    return wezterm.gui.get_appearance()
+  end
+  return 'Dark'
+end
+
+local scheme = get_appearance() == 'Dark' and 'Gruvbox dark, hard (base16)' or 'Gruvbox light, hard (base16)'
+
+-- =============================================================================
 -- Common Settings
 -- =============================================================================
-config.color_scheme = 'Gruvbox dark, hard (base16)'
+config.color_scheme = scheme
 config.window_background_opacity = 0.94
 config.window_decorations = "INTEGRATED_BUTTONS"
 

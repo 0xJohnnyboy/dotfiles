@@ -43,13 +43,19 @@
     dest: "{{ ansible_user_dir }}/.config/tmux/plugins/tpm"
     version: master
     update: yes
-  ignore_errors: yes
 
 - name: Ensure tmux resurrect directory exists
   file:
     path: "{{ ansible_user_dir }}/.config/tmux/resurrect"
     state: directory
     mode: '0755'
+
+- name: Install tmux plugins via TPM
+  command: "{{ ansible_user_dir }}/.config/tmux/plugins/tpm/bin/install_plugins"
+  args:
+    creates: "{{ ansible_user_dir }}/.config/tmux/plugins/tmux-powerline"
+  environment:
+    TMUX_PLUGIN_MANAGER_PATH: "{{ ansible_user_dir }}/.config/tmux/plugins/"
 
 - name: Check if tmux is running
   command: pgrep tmux
@@ -61,10 +67,23 @@
   debug:
     msg: |
       tmux installed successfully!
-      TPM (Tmux Plugin Manager) installed to ~/.config/tmux/plugins/tpm
 
-      To install tmux plugins:
-      1. Start tmux: tmux
-      2. Press prefix + I (Ctrl+Space then I) to install plugins
+      ✅ TPM (Tmux Plugin Manager) installed
+      ✅ tmux plugins installed:
+         - tmux-sensible (sensible defaults)
+         - tmux-powerline (enhanced status line)
+         - tmux-resurrect (session persistence)
+         - tmux-continuum (automatic session saving)
 
-      Your tmux.conf is already in place from dotfiles.
+      Your tmux.conf is ready with:
+      - Prefix key: Ctrl+Space
+      - Pane navigation: prefix + h/j/k/l
+      - Session resurrection: automatic on startup
+
+      {% if tmux_running.rc == 0 %}
+      ⚠️  tmux is currently running. To see changes:
+         - Reload config in tmux: Ctrl+Space then : source-file ~/.config/tmux/tmux.conf
+         - Or restart tmux sessions
+      {% else %}
+      Start tmux: tmux
+      {% endif %}

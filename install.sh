@@ -154,10 +154,18 @@ install_ansible() {
     fi
 
     log_info "Installing Ansible..."
-    python3 -m pip install --user ansible
-
-    # Add pip user bin to PATH if not already there
-    export PATH="$HOME/.local/bin:$PATH"
+    case "$OS" in
+        macos)
+            # On macOS, use pip
+            python3 -m pip install --user ansible
+            export PATH="$HOME/.local/bin:$PATH"
+            ;;
+        wsl|linux)
+            # On Linux/WSL, prefer apt to avoid PEP 668 issues
+            sudo apt update
+            sudo apt install -y ansible
+            ;;
+    esac
 
     log_success "Ansible installed"
 }

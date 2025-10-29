@@ -107,22 +107,44 @@ install_git() {
 }
 
 install_python() {
+    local python_installed=false
+    local pip_installed=false
+
     if check_command python3; then
         log_success "Python already installed: $(python3 --version)"
+        python_installed=true
+    fi
+
+    # Check if pip is available
+    if python3 -m pip --version &> /dev/null; then
+        log_success "pip already available"
+        pip_installed=true
+    fi
+
+    # If both are installed, we're done
+    if [ "$python_installed" = true ] && [ "$pip_installed" = true ]; then
         return
     fi
 
-    log_info "Installing Python 3..."
+    log_info "Installing Python 3 and pip..."
     case "$OS" in
         macos)
-            brew install python3
+            if [ "$python_installed" = false ]; then
+                brew install python3
+            fi
+            # On macOS, pip comes with python3
             ;;
         wsl|linux)
             sudo apt update
-            sudo apt install -y python3 python3-pip
+            if [ "$python_installed" = false ]; then
+                sudo apt install -y python3
+            fi
+            if [ "$pip_installed" = false ]; then
+                sudo apt install -y python3-pip
+            fi
             ;;
     esac
-    log_success "Python installed"
+    log_success "Python and pip installed"
 }
 
 install_ansible() {

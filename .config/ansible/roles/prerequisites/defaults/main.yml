@@ -15,6 +15,7 @@ build_dependencies_apt:
   - libcurl4-openssl-dev
   - libssl-dev
   - libexpat1-dev
+  - fontconfig
   - wget
   - unzip
   - git

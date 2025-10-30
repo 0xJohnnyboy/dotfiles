@@ -95,23 +95,51 @@ is_step_complete() {
 }
 
 setup_git_access() {
-    echo ""
-    log_info "GitHub Repository Access"
-    echo ""
-    echo "Choose how to clone the dotfiles repository:"
-    echo "  1) HTTPS (no setup required, read-only)"
-    echo "  2) SSH (requires GitHub SSH key setup, read-write)"
-    echo ""
-    read -p "Enter choice (1 or 2): " choice < /dev/tty
+    # If USE_HTTPS or USE_SSH already set by CLI args, skip prompt
+    if [ -n "$USE_HTTPS" ]; then
+        log_info "Using HTTPS (from --https flag)"
+        DOTFILES_REPO="https://github.com/0xJohnnyboy/dotfiles.git"
+        echo ""
+        return
+    fi
 
-    case "$choice" in
-        1)
-            log_info "Using HTTPS"
-            DOTFILES_REPO="https://github.com/0xJohnnyboy/dotfiles.git"
-            ;;
-        2)
-            log_info "Using SSH"
-            DOTFILES_REPO="git@github.com:0xJohnnyboy/dotfiles.git"
+    if [ -n "$USE_SSH" ]; then
+        log_info "Using SSH (from --ssh flag)"
+        DOTFILES_REPO="git@github.com:0xJohnnyboy/dotfiles.git"
+        # Continue to SSH key setup below
+    else
+        # Interactive prompt
+        echo ""
+        log_info "GitHub Repository Access"
+        echo ""
+        echo "Choose how to clone the dotfiles repository:"
+        echo "  1) HTTPS (no setup required, read-only)"
+        echo "  2) SSH (requires GitHub SSH key setup, read-write)"
+        echo ""
+        read -p "Enter choice (1 or 2): " choice < /dev/tty
+
+        case "$choice" in
+            1)
+                log_info "Using HTTPS"
+                DOTFILES_REPO="https://github.com/0xJohnnyboy/dotfiles.git"
+                echo ""
+                return
+                ;;
+            2)
+                log_info "Using SSH"
+                DOTFILES_REPO="git@github.com:0xJohnnyboy/dotfiles.git"
+                ;;
+            *)
+                log_error "Invalid choice. Using HTTPS as default."
+                DOTFILES_REPO="https://github.com/0xJohnnyboy/dotfiles.git"
+                echo ""
+                return
+                ;;
+        esac
+    fi
+
+    # SSH key setup (only reached if SSH chosen)
+    if [ "$DOTFILES_REPO" = "git@github.com:0xJohnnyboy/dotfiles.git" ]; then
 
             # Check if SSH key exists
             if [ ! -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_rsa" ]; then
@@ -138,14 +166,9 @@ setup_git_access() {
             echo "  2. Paste the key above"
             echo "  3. Click 'Add SSH key'"
             echo ""
-            read -p "Press ENTER when you've added the key to GitHub..." < /dev/tty
-            log_success "Continuing with SSH"
-            ;;
-        *)
-            log_error "Invalid choice. Using HTTPS as default."
-            DOTFILES_REPO="https://github.com/0xJohnnyboy/dotfiles.git"
-            ;;
-    esac
+        read -p "Press ENTER when you've added the key to GitHub..." < /dev/tty
+        log_success "Continuing with SSH"
+    fi
     echo ""
 }
 
@@ -335,9 +358,19 @@ main() {
     MINIMAL=false
     TAGS=""
     SKIP_ANSIBLE=false
+    USE_HTTPS=""
+    USE_SSH=""
 
     while [[ $# -gt 0 ]]; do
         case $1 in
+            --https)
+                USE_HTTPS=true
+                shift
+                ;;
+            --ssh)
+                USE_SSH=true
+                shift
+                ;;
             --dry-run)
                 DRY_RUN=true
                 shift
@@ -365,6 +398,8 @@ main() {
 Usage: $0 [OPTIONS]
 
 Options:
+    --https             Use HTTPS for git clone (skip interactive prompt)
+    --ssh               Use SSH for git clone (skip interactive prompt)
     --dry-run           Show what would be installed without making changes
     --minimal           Install only shell, cli tools, and dotfiles
     --tags TAGS         Run only specific Ansible tags (comma-separated)
@@ -373,7 +408,9 @@ Options:
     --help              Show this help message
 
 Examples:
-    $0                              # Full installation
+    $0                              # Full installation (interactive prompt)
+    $0 --https                      # Use HTTPS, no prompt
+    $0 --ssh                        # Use SSH with key setup, no prompt
     $0 --minimal                    # Minimal installation
     $0 --tags neovim,git            # Install only neovim and git
     $0 --dry-run                    # Preview what would be installed

@@ -88,6 +88,23 @@
     - "@angular/language-server"
   ignore_errors: yes
 
+- name: Install global npm packages
+  shell: |
+    export NVM_DIR="{{ ansible_user_dir }}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm use {{ node_lts_version }}
+    npm install -g {{ item }}
+  args:
+    executable: /bin/bash
+  loop:
+    - "@anthropic-ai/claude-code"
+    - "@google/gemini"
+    - "@mistweaverco/kulala-ls"
+    - tree-sitter-cli
+    - pnpm
+    - corepack
+  ignore_errors: yes
+
 # =============================================================================
 # Rust Installation (via rustup)
 # =============================================================================
@@ -152,6 +169,12 @@
         - nvm installed to ~/.nvm
         - typescript-language-server
         - @angular/language-server
+        - @anthropic-ai/claude-code
+        - @google/gemini
+        - @mistweaverco/kulala-ls
+        - tree-sitter-cli
+        - pnpm
+        - corepack
 
       Rust {{ rust_version }} (via rustup):
         - rustup installed to ~/.cargo

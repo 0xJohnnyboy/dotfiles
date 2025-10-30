@@ -281,13 +281,19 @@ install_ansible() {
 }
 
 clone_dotfiles() {
+    # Check if cached but verify directory actually exists
     if is_step_complete "dotfiles"; then
-        log_success "Dotfiles already cloned (cached)"
         if [ -d "$DOTFILES_DIR" ]; then
+            log_success "Dotfiles already cloned (cached)"
             log_info "Pulling latest changes..."
             git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" pull
+            return
+        else
+            log_warning "Dotfiles marked as complete but directory missing, re-cloning..."
+            # Remove from cache and continue to clone
+            grep -v "^dotfiles$" "$STATE_FILE" > "$STATE_FILE.tmp" 2>/dev/null || true
+            mv "$STATE_FILE.tmp" "$STATE_FILE" 2>/dev/null || true
         fi
-        return
     fi
 
     if [ -d "$DOTFILES_DIR" ]; then
@@ -299,7 +305,11 @@ clone_dotfiles() {
     fi
 
     log_info "Cloning dotfiles repository..."
-    git clone --bare "$DOTFILES_REPO" "$DOTFILES_DIR"
+    if ! git clone --bare "$DOTFILES_REPO" "$DOTFILES_DIR"; then
+        log_error "Failed to clone dotfiles repository"
+        log_info "Please check your network connection and repository access"
+        exit 1
+    fi
 
     log_info "Checking out dotfiles..."
 
@@ -312,7 +322,11 @@ clone_dotfiles() {
         mv "$HOME/$file" "$HOME/.dotfiles-backup/$file" 2>/dev/null || true
     done
 
-    git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" checkout main
+    if ! git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" checkout main; then
+        log_error "Failed to checkout dotfiles"
+        exit 1
+    fi
+
     git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" config status.showUntrackedFiles no
 
     log_success "Dotfiles checked out"

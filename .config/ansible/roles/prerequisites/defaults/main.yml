@@ -12,6 +12,9 @@ build_dependencies_apt:
   - libtool
   - gettext
   - curl
+  - libcurl4-openssl-dev
+  - libssl-dev
+  - libexpat1-dev
   - wget
   - unzip
   - git

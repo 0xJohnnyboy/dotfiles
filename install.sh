@@ -16,9 +16,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-DOTFILES_REPO="git@github.com:0xJohnnyboy/dotfiles.git"
 DOTFILES_DIR="$HOME/.dotfiles"
 ANSIBLE_PLAYBOOK="$HOME/.config/ansible/playbook.yml"
+DOTFILES_REPO=""  # Will be set based on user choice
 
 # =============================================================================
 # Helper Functions
@@ -81,6 +81,61 @@ detect_os() {
 
 check_command() {
     command -v "$1" &> /dev/null
+}
+
+setup_git_access() {
+    echo ""
+    log_info "GitHub Repository Access"
+    echo ""
+    echo "Choose how to clone the dotfiles repository:"
+    echo "  1) HTTPS (no setup required, read-only)"
+    echo "  2) SSH (requires GitHub SSH key setup, read-write)"
+    echo ""
+    read -p "Enter choice (1 or 2): " choice
+
+    case "$choice" in
+        1)
+            log_info "Using HTTPS"
+            DOTFILES_REPO="https://github.com/0xJohnnyboy/dotfiles.git"
+            ;;
+        2)
+            log_info "Using SSH"
+            DOTFILES_REPO="git@github.com:0xJohnnyboy/dotfiles.git"
+
+            # Check if SSH key exists
+            if [ ! -f "$HOME/.ssh/id_ed25519" ] && [ ! -f "$HOME/.ssh/id_rsa" ]; then
+                log_info "No SSH key found. Generating new ED25519 key..."
+                mkdir -p "$HOME/.ssh"
+                ssh-keygen -t ed25519 -C "$(whoami)@$(hostname)" -f "$HOME/.ssh/id_ed25519" -N ""
+                log_success "SSH key generated"
+            else
+                log_success "SSH key already exists"
+            fi
+
+            # Display the public key
+            echo ""
+            log_info "Your SSH public key:"
+            echo ""
+            if [ -f "$HOME/.ssh/id_ed25519.pub" ]; then
+                cat "$HOME/.ssh/id_ed25519.pub"
+            elif [ -f "$HOME/.ssh/id_rsa.pub" ]; then
+                cat "$HOME/.ssh/id_rsa.pub"
+            fi
+            echo ""
+            log_warning "Please add this key to your GitHub account:"
+            echo "  1. Go to: https://github.com/settings/ssh/new"
+            echo "  2. Paste the key above"
+            echo "  3. Click 'Add SSH key'"
+            echo ""
+            read -p "Press ENTER when you've added the key to GitHub..."
+            log_success "Continuing with SSH"
+            ;;
+        *)
+            log_error "Invalid choice. Using HTTPS as default."
+            DOTFILES_REPO="https://github.com/0xJohnnyboy/dotfiles.git"
+            ;;
+    esac
+    echo ""
 }
 
 # =============================================================================
@@ -287,24 +342,27 @@ EOF
     detect_os
     echo ""
 
-    log_info "Step 1/6: Installing git..."
+    log_info "Step 1/7: Setting up GitHub access..."
+    setup_git_access
+
+    log_info "Step 2/7: Installing git..."
     install_git
     echo ""
 
-    log_info "Step 2/6: Installing Python..."
+    log_info "Step 3/7: Installing Python..."
     install_python
     echo ""
 
-    log_info "Step 3/6: Installing Ansible..."
+    log_info "Step 4/7: Installing Ansible..."
     install_ansible
     echo ""
 
-    log_info "Step 4/6: Cloning dotfiles repository..."
+    log_info "Step 5/7: Cloning dotfiles repository..."
     clone_dotfiles
     echo ""
 
     if [ "$SKIP_ANSIBLE" = false ]; then
-        log_info "Step 5/6: Running Ansible playbook..."
+        log_info "Step 6/7: Running Ansible playbook..."
         run_ansible
         echo ""
     else
@@ -312,7 +370,7 @@ EOF
         echo ""
     fi
 
-    log_info "Step 6/6: Final setup..."
+    log_info "Step 7/7: Final setup..."
 
     # Add dotfiles alias to current shell session
     alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME"

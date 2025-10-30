@@ -24,9 +24,9 @@
   when: ansible_os_family == "Debian"
   become: true
 
-- name: Set Docker repository release (use jammy for noble/24.04)
+- name: Detect system architecture
   set_fact:
-    docker_repo_release: "{{ 'jammy' if ansible_distribution_release == 'noble' else ansible_distribution_release }}"
+    docker_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' if ansible_architecture == 'aarch64' else ansible_architecture }}"
   when: ansible_os_family == "Debian"
 
 - name: Add Docker GPG key (Debian/Ubuntu)
@@ -38,7 +38,7 @@
 
 - name: Add Docker repository (Debian/Ubuntu)
   apt_repository:
-    repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ docker_repo_release }} stable"
+    repo: "deb [arch={{ docker_arch }} signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
     filename: docker
   when: ansible_os_family == "Debian" and not is_wsl

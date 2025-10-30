@@ -19,6 +19,7 @@ NC='\033[0m' # No Color
 DOTFILES_DIR="$HOME/.dotfiles"
 ANSIBLE_PLAYBOOK="$HOME/.config/ansible/playbook.yml"
 DOTFILES_REPO=""  # Will be set based on user choice
+STATE_FILE="$HOME/.dotfiles-install-state"
 
 # =============================================================================
 # Helper Functions
@@ -83,6 +84,16 @@ check_command() {
     command -v "$1" &> /dev/null
 }
 
+mark_step_complete() {
+    local step="$1"
+    echo "$step" >> "$STATE_FILE"
+}
+
+is_step_complete() {
+    local step="$1"
+    [ -f "$STATE_FILE" ] && grep -q "^$step$" "$STATE_FILE"
+}
+
 setup_git_access() {
     echo ""
     log_info "GitHub Repository Access"
@@ -143,8 +154,14 @@ setup_git_access() {
 # =============================================================================
 
 install_git() {
+    if is_step_complete "git"; then
+        log_success "Git already validated (cached)"
+        return
+    fi
+
     if check_command git; then
         log_success "Git already installed: $(git --version)"
+        mark_step_complete "git"
         return
     fi
 
@@ -159,9 +176,15 @@ install_git() {
             ;;
     esac
     log_success "Git installed"
+    mark_step_complete "git"
 }
 
 install_python() {
+    if is_step_complete "python"; then
+        log_success "Python and pip already validated (cached)"
+        return
+    fi
+
     local python_installed=false
     local pip_installed=false
 
@@ -178,6 +201,7 @@ install_python() {
 
     # If both are installed, we're done
     if [ "$python_installed" = true ] && [ "$pip_installed" = true ]; then
+        mark_step_complete "python"
         return
     fi
 
@@ -200,11 +224,18 @@ install_python() {
             ;;
     esac
     log_success "Python and pip installed"
+    mark_step_complete "python"
 }
 
 install_ansible() {
+    if is_step_complete "ansible"; then
+        log_success "Ansible already validated (cached)"
+        return
+    fi
+
     if check_command ansible-playbook; then
         log_success "Ansible already installed: $(ansible --version | head -1)"
+        mark_step_complete "ansible"
         return
     fi
 
@@ -223,13 +254,24 @@ install_ansible() {
     esac
 
     log_success "Ansible installed"
+    mark_step_complete "ansible"
 }
 
 clone_dotfiles() {
+    if is_step_complete "dotfiles"; then
+        log_success "Dotfiles already cloned (cached)"
+        if [ -d "$DOTFILES_DIR" ]; then
+            log_info "Pulling latest changes..."
+            git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" pull
+        fi
+        return
+    fi
+
     if [ -d "$DOTFILES_DIR" ]; then
         log_warning "Dotfiles repository already exists at $DOTFILES_DIR"
         log_info "Pulling latest changes..."
         git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" pull
+        mark_step_complete "dotfiles"
         return
     fi
 
@@ -251,6 +293,7 @@ clone_dotfiles() {
     git --git-dir="$DOTFILES_DIR" --work-tree="$HOME" config status.showUntrackedFiles no
 
     log_success "Dotfiles checked out"
+    mark_step_complete "dotfiles"
 }
 
 run_ansible() {
@@ -311,6 +354,12 @@ main() {
                 SKIP_ANSIBLE=true
                 shift
                 ;;
+            --reset-cache)
+                log_info "Clearing installation cache..."
+                rm -f "$STATE_FILE"
+                log_success "Cache cleared"
+                shift
+                ;;
             --help)
                 cat << EOF
 Usage: $0 [OPTIONS]
@@ -320,6 +369,7 @@ Options:
     --minimal           Install only shell, cli tools, and dotfiles
     --tags TAGS         Run only specific Ansible tags (comma-separated)
     --skip-ansible      Only clone dotfiles, skip Ansible installation
+    --reset-cache       Clear installation state cache (force re-check all steps)
     --help              Show this help message
 
 Examples:
@@ -327,6 +377,9 @@ Examples:
     $0 --minimal                    # Minimal installation
     $0 --tags neovim,git            # Install only neovim and git
     $0 --dry-run                    # Preview what would be installed
+    $0 --reset-cache                # Clear cache and re-check everything
+
+Cache file location: ~/.dotfiles-install-state
 
 EOF
                 exit 0

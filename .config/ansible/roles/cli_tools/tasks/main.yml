@@ -99,18 +99,39 @@
 
 - name: Install lazygit - Debian/Ubuntu
   block:
-    - name: Add lazygit PPA
-      apt_repository:
-        repo: ppa:lazygit-team/release
-        state: present
+    - name: Get latest lazygit release
+      uri:
+        url: https://api.github.com/repos/jesseduffield/lazygit/releases/latest
+        return_content: yes
+      register: lazygit_release
+
+    - name: Download lazygit
+      get_url:
+        url: "https://github.com/jesseduffield/lazygit/releases/download/{{ lazygit_release.json.tag_name }}/lazygit_{{ lazygit_release.json.tag_name | regex_replace('^v', '') }}_Linux_x86_64.tar.gz"
+        dest: "/tmp/lazygit.tar.gz"
+        mode: '0644'
+
+    - name: Extract lazygit
+      unarchive:
+        src: "/tmp/lazygit.tar.gz"
+        dest: "/tmp"
+        remote_src: yes
+
+    - name: Install lazygit binary
+      copy:
+        src: "/tmp/lazygit"
+        dest: "/usr/local/bin/lazygit"
+        mode: '0755'
+        remote_src: yes
       become: true
 
-    - name: Install lazygit
-      apt:
-        name: lazygit
-        state: present
-        update_cache: true
-      become: true
+    - name: Clean up lazygit download
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/tmp/lazygit.tar.gz"
+        - "/tmp/lazygit"
   when: ansible_os_family == "Debian"
 
 - name: Display CLI tools installation completion

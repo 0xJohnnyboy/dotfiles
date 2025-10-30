@@ -1,0 +1,46 @@
+---
+# Build dependencies for different package managers
+build_dependencies_apt:
+  - build-essential
+  - gcc
+  - g++
+  - make
+  - cmake
+  - autoconf
+  - automake
+  - pkg-config
+  - libtool
+  - gettext
+  - curl
+  - wget
+  - unzip
+  - git
+
+build_dependencies_dnf:
+  - gcc
+  - gcc-c++
+  - make
+  - cmake
+  - autoconf
+  - automake
+  - pkgconfig
+  - libtool
+  - gettext
+  - curl
+  - wget
+  - unzip
+  - git
+
+build_dependencies:
+  - gcc
+  - make
+  - cmake
+  - autoconf
+  - automake
+  - pkg-config
+  - libtool
+  - gettext
+  - curl
+  - wget
+  - unzip
+  - git

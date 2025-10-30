@@ -24,9 +24,9 @@
     path: "{{ ansible_user_dir }}/.oh-my-zsh"
   register: ohmyzsh_check
 
-- name: Install oh-my-zsh
+- name: Install oh-my-zsh (preserve existing .zshrc)
   shell: |
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
   when: not ohmyzsh_check.stat.exists
 
 - name: Check if starship is installed

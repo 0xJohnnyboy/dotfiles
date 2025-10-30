@@ -3,7 +3,7 @@
 # Version Pinning
 # =============================================================================
 git_version: "2.47.0"
-neovim_version: "0.10.2"
+neovim_version: "0.11.4"
 go_version: "1.22.5"
 node_lts_version: "20"
 rust_version: "stable"
@@ -20,6 +20,7 @@ dotfiles_work_tree: "{{ ansible_user_dir }}"
 # =============================================================================
 nerd_font_name: "JetBrainsMono"
 nerd_font_version: "3.2.1"
+font_install_path: "{{ ansible_user_dir }}/.local/share/fonts"  # Linux default, overridden by Darwin.yml on macOS
 
 # =============================================================================
 # Feature Flags

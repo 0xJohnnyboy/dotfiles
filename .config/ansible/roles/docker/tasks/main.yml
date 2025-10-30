@@ -24,6 +24,16 @@
   when: ansible_os_family == "Debian"
   become: true
 
+- name: Remove old Docker repository files (Debian/Ubuntu)
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/download_docker_com_linux_ubuntu.list
+    - /etc/apt/sources.list.d/docker.list
+  when: ansible_os_family == "Debian"
+  become: true
+
 - name: Add Docker GPG key (Debian/Ubuntu)
   shell: |
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --yes --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg

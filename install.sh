@@ -102,7 +102,7 @@ setup_git_access() {
     echo "  1) HTTPS (no setup required, read-only)"
     echo "  2) SSH (requires GitHub SSH key setup, read-write)"
     echo ""
-    read -p "Enter choice (1 or 2): " choice
+    read -p "Enter choice (1 or 2): " choice < /dev/tty
 
     case "$choice" in
         1)
@@ -138,7 +138,7 @@ setup_git_access() {
             echo "  2. Paste the key above"
             echo "  3. Click 'Add SSH key'"
             echo ""
-            read -p "Press ENTER when you've added the key to GitHub..."
+            read -p "Press ENTER when you've added the key to GitHub..." < /dev/tty
             log_success "Continuing with SSH"
             ;;
         *)

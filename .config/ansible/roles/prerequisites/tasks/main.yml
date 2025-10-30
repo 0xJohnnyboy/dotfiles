@@ -1,4 +1,15 @@
 ---
+- name: Remove conflicting Docker repository files (Debian/Ubuntu)
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list.d/download_docker_com_linux_ubuntu.list
+    - /etc/apt/sources.list.d/docker.list
+  when: ansible_os_family == "Debian"
+  become: true
+  ignore_errors: true
+
 - name: Install build dependencies (Debian/Ubuntu)
   apt:
     name: "{{ build_dependencies_apt }}"

@@ -11,46 +11,34 @@
   become: false
 
 - name: Check if WezTerm is already installed (Linux)
-  stat:
-    path: /usr/local/bin/wezterm
-  register: wezterm_installed
+  command: wezterm --version
+  register: wezterm_check
+  failed_when: false
+  changed_when: false
   when: ansible_os_family != "Darwin"
 
-- name: Get latest WezTerm release info (Linux)
-  uri:
-    url: https://api.github.com/repos/wez/wezterm/releases/latest
-    return_content: yes
-  register: wezterm_release
-  when: ansible_os_family != "Darwin" and not wezterm_installed.stat.exists
+- name: Install WezTerm via official repository (Ubuntu/Debian)
+  block:
+    - name: Add WezTerm GPG key
+      shell: |
+        curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg
+      args:
+        creates: /usr/share/keyrings/wezterm-fury.gpg
 
-- name: Download WezTerm AppImage (Linux)
-  get_url:
-    url: "https://github.com/wez/wezterm/releases/latest/download/WezTerm-{{ wezterm_release.json.tag_name }}-Ubuntu20.04.AppImage"
-    dest: "/tmp/wezterm.appimage"
-    mode: '0755'
-  when: ansible_os_family != "Darwin" and not wezterm_installed.stat.exists and not is_wsl
+    - name: Add WezTerm repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *"
+        state: present
+        filename: wezterm
+      become: true
 
-- name: Install WezTerm AppImage (Linux)
-  copy:
-    src: /tmp/wezterm.appimage
-    dest: /usr/local/bin/wezterm
-    mode: '0755'
-    remote_src: yes
-  become: true
-  when: ansible_os_family != "Darwin" and not wezterm_installed.stat.exists and not is_wsl
-
-- name: Download WezTerm .deb package (Ubuntu/Debian/WSL)
-  get_url:
-    url: "https://github.com/wez/wezterm/releases/latest/download/wezterm-{{ wezterm_release.json.tag_name }}-Ubuntu20.04.deb"
-    dest: "/tmp/wezterm.deb"
-  when: ansible_os_family == "Debian" and not wezterm_installed.stat.exists
-
-- name: Install WezTerm .deb package (Ubuntu/Debian/WSL)
-  apt:
-    deb: /tmp/wezterm.deb
-    state: present
-  become: true
-  when: ansible_os_family == "Debian" and not wezterm_installed.stat.exists
+    - name: Install WezTerm
+      apt:
+        name: wezterm
+        state: present
+        update_cache: yes
+      become: true
+  when: ansible_os_family == "Debian" and wezterm_check.rc != 0
 
 - name: Install Nerd Fonts (macOS)
   homebrew:

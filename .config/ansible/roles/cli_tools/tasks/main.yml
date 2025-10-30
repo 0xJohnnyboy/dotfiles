@@ -41,15 +41,16 @@
 - name: Install eza (modern ls replacement) - Debian/Ubuntu
   block:
     - name: Add eza gpg key
-      apt_key:
-        url: https://raw.githubusercontent.com/eza-community/eza/main/deb.asc
-        state: present
-      become: true
+      shell: |
+        curl -fsSL https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --yes --dearmor -o /usr/share/keyrings/gierens.gpg
+      args:
+        creates: /usr/share/keyrings/gierens.gpg
 
     - name: Add eza repository
       apt_repository:
         repo: "deb [signed-by=/usr/share/keyrings/gierens.gpg] http://deb.gierens.de stable main"
         state: present
+        filename: eza
       become: true
 
     - name: Install eza
@@ -85,6 +86,7 @@
       apt_repository:
         repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
         state: present
+        filename: github-cli
       become: true
 
     - name: Install gh

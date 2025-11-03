@@ -70,6 +70,9 @@ if [ "$IS_LINUX" = true ] || [ "$IS_WSL" = true ]; then
     export PATH="$HOME/zig-linux-x86_64-0.14.0-dev.43+96501d338:$PATH"
 fi
 
+# Tmux-powerline configuration
+[ -f "$HOME/.config/tmux-powerline/config.sh" ] && source "$HOME/.config/tmux-powerline/config.sh"
+
 # =============================================================================
 # Aliases
 # =============================================================================

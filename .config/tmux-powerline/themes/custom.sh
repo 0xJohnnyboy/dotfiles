@@ -1,10 +1,11 @@
-# Custom Gruvbox Theme with Rounded Separators (E0B4) and Extra Padding
+# shellcheck shell=bash
+# Custom Gruvbox Theme with Rounded Separators
 
-if tp_patched_font_in_use; then
-	TMUX_POWERLINE_SEPARATOR_LEFT_BOLD=""
-	TMUX_POWERLINE_SEPARATOR_LEFT_THIN=""
-	TMUX_POWERLINE_SEPARATOR_RIGHT_BOLD=""
-	TMUX_POWERLINE_SEPARATOR_RIGHT_THIN=""
+if patched_font_in_use; then
+	TMUX_POWERLINE_SEPARATOR_LEFT_BOLD=""
+	TMUX_POWERLINE_SEPARATOR_LEFT_THIN=""
+	TMUX_POWERLINE_SEPARATOR_RIGHT_BOLD=""
+	TMUX_POWERLINE_SEPARATOR_RIGHT_THIN=""
 else
 	TMUX_POWERLINE_SEPARATOR_LEFT_BOLD="◀"
 	TMUX_POWERLINE_SEPARATOR_LEFT_THIN="❮"
@@ -15,45 +16,49 @@ fi
 # Gruvbox dark colors
 TMUX_POWERLINE_DEFAULT_BACKGROUND_COLOR=${TMUX_POWERLINE_DEFAULT_BACKGROUND_COLOR:-'237'}
 TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR=${TMUX_POWERLINE_DEFAULT_FOREGROUND_COLOR:-'223'}
-TMUX_POWERLINE_SEG_AIR_COLOR=$(tp_air_color)
+# shellcheck disable=SC2034
+TMUX_POWERLINE_SEG_AIR_COLOR=$(air_color)
 
 TMUX_POWERLINE_DEFAULT_LEFTSIDE_SEPARATOR=${TMUX_POWERLINE_DEFAULT_LEFTSIDE_SEPARATOR:-$TMUX_POWERLINE_SEPARATOR_RIGHT_BOLD}
 TMUX_POWERLINE_DEFAULT_RIGHTSIDE_SEPARATOR=${TMUX_POWERLINE_DEFAULT_RIGHTSIDE_SEPARATOR:-$TMUX_POWERLINE_SEPARATOR_LEFT_BOLD}
 
-# Active window - with separators and padding
-if [ -z $TMUX_POWERLINE_WINDOW_STATUS_CURRENT ]; then
+# shellcheck disable=SC2128
+if [ -z "$TMUX_POWERLINE_WINDOW_STATUS_CURRENT" ]; then
 	TMUX_POWERLINE_WINDOW_STATUS_CURRENT=(
-		"#[$(tp_format inverse)]" \
-		"$TMUX_POWERLINE_DEFAULT_LEFTSIDE_SEPARATOR" \
-		"  #I#F #W  " \
-		"#[$(tp_format regular)]" \
+		"#[$(format inverse)]"
+		"$TMUX_POWERLINE_DEFAULT_LEFTSIDE_SEPARATOR"
+		"  #I#F #W  "
+		"#[$(format regular)]"
 		"$TMUX_POWERLINE_DEFAULT_LEFTSIDE_SEPARATOR"
 	)
 fi
 
-if [ -z $TMUX_POWERLINE_WINDOW_STATUS_STYLE ]; then
+# shellcheck disable=SC2128
+if [ -z "$TMUX_POWERLINE_WINDOW_STATUS_STYLE" ]; then
 	TMUX_POWERLINE_WINDOW_STATUS_STYLE=(
-		"$(tp_format regular)"
+		"$(format regular)"
 	)
 fi
 
-# Inactive windows - more padding
-if [ -z $TMUX_POWERLINE_WINDOW_STATUS_FORMAT ]; then
+# shellcheck disable=SC2128
+if [ -z "$TMUX_POWERLINE_WINDOW_STATUS_FORMAT" ]; then
 	TMUX_POWERLINE_WINDOW_STATUS_FORMAT=(
-		"#[$(tp_format regular)]" \
-		"   #I#F #W   "
+		"#[$(format regular)]"
+		"  #I#{?window_flags,#F, } #W  "
 	)
 fi
 
-if [ -z $TMUX_POWERLINE_LEFT_STATUS_SEGMENTS ]; then
+# shellcheck disable=SC1143,SC2128
+if [ -z "$TMUX_POWERLINE_LEFT_STATUS_SEGMENTS" ]; then
 	TMUX_POWERLINE_LEFT_STATUS_SEGMENTS=(
-		"tmux_session_info 214 235" \
-		"hostname 208 235" \
-		"pwd 172 235" \
+		"tmux_session_info 214 235"
+		"hostname 208 235"
+		"pwd 172 235"
 	)
 fi
 
-if [ -z $TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS ]; then
+# shellcheck disable=SC1143,SC2128
+if [ -z "$TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS" ]; then
 	TMUX_POWERLINE_RIGHT_STATUS_SEGMENTS=(
 	)
 fi

@@ -40,6 +40,7 @@ source $ZSH/oh-my-zsh.sh
 
 # Additional paths
 export PATH="/opt/projects:$PATH"
+export PATH="/usr/local/go/bin:$PATH"
 export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 export PATH="$PATH:$HOME/.dotnet/tools"

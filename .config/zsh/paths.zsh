@@ -3,6 +3,9 @@
 # =============================================================================
 # Environment paths for development tools and utilities
 
+# User binaries
+export PATH="$HOME/.local/bin:$PATH"
+
 # Project directories
 export PATH="/opt/projects:$PATH"
 

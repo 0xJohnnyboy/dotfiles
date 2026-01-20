@@ -27,6 +27,7 @@ fi
 
 if [ "$IS_LINUX" = true ] || [ "$IS_WSL" = true ]; then
     export PATH="$HOME/zig-linux-x86_64-0.14.0-dev.43+96501d338:$PATH"
+    export PATH="/home/tlambert/.opencode/bin:$PATH"
 fi
 
 # Node Version Manager

@@ -67,3 +67,4 @@ for local_config in "$ZSH_CONFIG_DIR"/*.local.zsh; do
     [ -f "$local_config" ] && source "$local_config"
 done
 unsetopt nullglob
+

@@ -134,6 +134,11 @@
         - "/tmp/lazygit"
   when: ansible_os_family == "Debian"
 
+- name: Install opencode
+  shell: |
+    curl -fsSL https://opencode.ai/install | bash
+
+
 - name: Display CLI tools installation completion
   debug:
     msg: "✅ CLI tools installed successfully"

@@ -16,3 +16,4 @@ Focus on:
 - Maintainability
 
 You can discuss with other agents such as @backend-specialist and @brainstormer
+VERY IMPORTANT: event in sub-agent mode, you don't take initiatives before being absolutely sure it's ok to take actions

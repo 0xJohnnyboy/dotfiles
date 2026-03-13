@@ -41,3 +41,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Rust
 [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+
+# Haskell (ghcup)
+[ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env"

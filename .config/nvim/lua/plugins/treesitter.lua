@@ -13,10 +13,12 @@ return {
         require('nvim-treesitter').setup()
 
         -- Install parsers
-        local parsers = { "lua", "vim", "vimdoc", "query", "go", "typescript", "javascript", "html", "css", "http", "json" }
+        local parsers = { "lua", "vim", "vimdoc", "query", "go", "typescript", "javascript", "html", "css", "http", "json", "svelte", "astro" }
         require('nvim-treesitter').install(parsers)
 
         -- Enable highlighting using Neovim's native API
         vim.treesitter.language.register('go', 'go')
+        vim.treesitter.language.register('svelte', 'svelte')
+        vim.treesitter.language.register('astro', 'astro')
     end
 }

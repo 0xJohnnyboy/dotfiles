@@ -27,12 +27,13 @@ vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 -- LSP
 
 vim.lsp.enable({
-    'angular',
+    'angularls',
     'astro',
     'eslint',
     'gopls',
     'lua_ls',
-    'typescript',
+    'svelte',
+    'ts_ls',
 })
 
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }

@@ -26,16 +26,26 @@
 
 - name: Build neovim
   shell: |
-    make CMAKE_BUILD_TYPE=RelWithDebInfo
+    make -j{{ build_threads }} CMAKE_BUILD_TYPE=RelWithDebInfo
   args:
     chdir: "/tmp/neovim-build/neovim"
   when: nvim_check.rc != 0 or neovim_version not in nvim_check.stdout
 
+- name: Remove old Neovim runtime directories
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/local/share/nvim/runtime
+    - /usr/local/lib/nvim
+  become: true
+  when: nvim_check.rc != 0 or neovim_version not in nvim_check.stdout
+
 - name: Install neovim
-  shell: |
-    sudo make install
+  command: make install
   args:
     chdir: "/tmp/neovim-build/neovim"
+  become: true
   when: nvim_check.rc != 0 or neovim_version not in nvim_check.stdout
 
 - name: Clean up build directory

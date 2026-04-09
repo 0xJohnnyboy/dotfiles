@@ -32,11 +32,10 @@ vim.lsp.enable({
     'eslint',
     'gopls',
     'lua_ls',
-    'typescript',
+    'ts_ls',
 })
 
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 vim.diagnostic.config({
     virtual_lines = true
 })
-

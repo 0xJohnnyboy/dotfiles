@@ -1,16 +1,13 @@
 vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(ev)
         local client = vim.lsp.get_client_by_id(ev.data.client_id)
-        if client:supports_method('textDocument/completion') then
-            vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-            vim.keymap.set('i', '<C-I>', function()
-                vim.lsp.completion.get()
-            end)
-
-            vim.keymap.set('n', '<leader>lf', function()
-                vim.lsp.buf.format({ async = true })
-            end)
+        if not client then
+            return
         end
+
+        vim.keymap.set('n', '<leader>lf', function()
+            vim.lsp.buf.format({ async = true })
+        end, { buffer = ev.buf, desc = 'LSP format' })
     end,
 })
 

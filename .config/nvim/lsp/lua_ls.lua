@@ -1,5 +1,5 @@
 return {
-    cmd = { 'lua-language-server' },
+    cmd = { vim.fn.expand('~/.local/bin/lua-language-server') },
     filetypes = { 'lua' },
     root_markers = { '.git', '.stylua.toml', 'stylua.toml' },
     settings = {

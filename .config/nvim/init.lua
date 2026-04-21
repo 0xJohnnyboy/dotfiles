@@ -27,7 +27,7 @@ vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 -- LSP
 
 vim.lsp.enable({
-    'angularls',
+    'angular',
     'astro',
     'eslint',
     'gopls',
@@ -40,4 +40,3 @@ vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 vim.diagnostic.config({
     virtual_lines = true
 })
-

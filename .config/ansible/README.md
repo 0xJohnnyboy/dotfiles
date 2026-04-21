@@ -58,9 +58,9 @@ ansible-playbook playbook.yml --tags "git,neovim,cli"
 | `terminal` | WezTerm terminal emulator |
 | `cli` | CLI tools (ripgrep, fzf, fd, bat, eza, etc.) |
 | `docker` | Docker + docker-compose |
-| `languages` | Go, Node.js (nvm), Rust |
+| `languages` | Go, Node.js, and Rust tools |
 | `golang` | Go language and tools |
-| `nodejs` | Node.js via nvm |
+| `nodejs` | Node.js and npm tools |
 | `rust` | Rust via rustup |
 | `macos` | macOS-specific tools (aerospace, ice bar, etc.) |
 | `dotfiles` | Apply dotfiles configuration |
@@ -236,7 +236,7 @@ ansible-playbook playbook.yml --tags neovim -vvv
 ### Programming Languages
 
 - **Go** (specified version)
-- **Node.js** (via nvm, LTS version)
+- **Node.js** (via Homebrew on macOS, nvm on Linux)
 - **Rust** (via rustup, stable)
 
 ### Language Servers

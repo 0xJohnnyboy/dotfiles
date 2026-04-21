@@ -21,7 +21,7 @@ export ZSH="$HOME/.oh-my-zsh"
 if [ "$IS_MAC" = true ]; then
     plugins=(git)
 else
-    plugins=(git asdf vi-mode)
+    plugins=(git vi-mode)
 fi
 
 source $ZSH/oh-my-zsh.sh
@@ -67,4 +67,3 @@ for local_config in "$ZSH_CONFIG_DIR"/*.local.zsh; do
     [ -f "$local_config" ] && source "$local_config"
 done
 unsetopt nullglob
-

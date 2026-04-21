@@ -42,6 +42,12 @@
 
 - name: Install JetBrainsMono Nerd Font (macOS)
   block:
+    - name: Ensure fonts directory exists
+      file:
+        path: "{{ font_install_path }}"
+        state: directory
+        mode: '0755'
+
     - name: Download JetBrainsMono Nerd Font
       get_url:
         url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ nerd_font_version }}/{{ nerd_font_name }}.zip"

@@ -7,6 +7,11 @@
     - group_vars/all.yml
 
   pre_tasks:
+    - name: Load OS-specific variables
+      include_vars: "group_vars/{{ ansible_os_family }}.yml"
+      ignore_errors: true
+      tags: [always]
+
     - name: Display OS information
       debug:
         msg: |

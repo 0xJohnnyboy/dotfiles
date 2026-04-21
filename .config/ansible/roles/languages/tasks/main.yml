@@ -6,32 +6,40 @@
 # =============================================================================
 # Go Installation
 # =============================================================================
-- name: Check if Go is already installed
+- name: Install Go via Homebrew (macOS)
+  homebrew:
+    name: go
+    state: present
+  when: ansible_os_family == "Darwin"
+  become: false
+
+- name: Check if Go is already installed (Linux)
   command: go version
   register: go_installed
   failed_when: false
   changed_when: false
+  when: ansible_os_family != "Darwin"
 
-- name: Download Go
+- name: Download Go (Linux)
   get_url:
     url: "https://go.dev/dl/go{{ go_version }}.{{ ansible_system | lower }}-{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}.tar.gz"
     dest: "/tmp/go{{ go_version }}.tar.gz"
-  when: go_installed.rc != 0
+  when: ansible_os_family != "Darwin" and go_installed.rc != 0
 
-- name: Remove old Go installation
+- name: Remove old Go installation (Linux)
   file:
     path: /usr/local/go
     state: absent
   become: true
-  when: go_installed.rc != 0
+  when: ansible_os_family != "Darwin" and go_installed.rc != 0
 
-- name: Extract Go
+- name: Extract Go (Linux)
   unarchive:
     src: "/tmp/go{{ go_version }}.tar.gz"
     dest: /usr/local
     remote_src: yes
   become: true
-  when: go_installed.rc != 0
+  when: ansible_os_family != "Darwin" and go_installed.rc != 0
 
 - name: Ensure GOPATH bin directory exists
   file:
@@ -39,36 +47,48 @@
     state: directory
     mode: '0755'
 
-- name: Install Go language servers (gopls, delve)
+- name: Install Go developer tools
   command: "go install {{ item }}"
   loop:
     - golang.org/x/tools/gopls@latest
     - github.com/go-delve/delve/cmd/dlv@latest
+    - gotest.tools/gotestsum@latest
   environment:
-    PATH: "/usr/local/go/bin:{{ ansible_env.PATH }}"
+    PATH: "/opt/homebrew/bin:/usr/local/go/bin:{{ ansible_env.PATH }}"
     GOPATH: "{{ ansible_user_dir }}/go"
   ignore_errors: yes
 
 # =============================================================================
-# Node.js Installation (via nvm)
+# Node.js Installation
 # =============================================================================
-- name: Check if nvm is installed
+- name: Install Node.js and pnpm via Homebrew (macOS)
+  homebrew:
+    name:
+      - gemini-cli
+      - node
+      - pnpm
+    state: present
+  when: ansible_os_family == "Darwin"
+  become: false
+
+- name: Check if nvm is installed (Linux)
   stat:
     path: "{{ ansible_user_dir }}/.nvm/nvm.sh"
   register: nvm_installed
+  when: ansible_os_family != "Darwin"
 
-- name: Download nvm installer
+- name: Download nvm installer (Linux)
   get_url:
     url: https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh
     dest: /tmp/nvm_install.sh
     mode: '0755'
-  when: not nvm_installed.stat.exists
+  when: ansible_os_family != "Darwin" and not nvm_installed.stat.exists
 
-- name: Install nvm
+- name: Install nvm (Linux)
   shell: bash /tmp/nvm_install.sh
-  when: not nvm_installed.stat.exists
+  when: ansible_os_family != "Darwin" and not nvm_installed.stat.exists
 
-- name: Install Node.js LTS via nvm
+- name: Install Node.js LTS via nvm (Linux)
   shell: |
     export NVM_DIR="{{ ansible_user_dir }}/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -77,33 +97,18 @@
     nvm use {{ node_lts_version }}
   args:
     executable: /bin/bash
-  when: not nvm_installed.stat.exists
+  when: ansible_os_family != "Darwin"
 
-- name: Install Node.js language servers
-  shell: |
-    export NVM_DIR="{{ ansible_user_dir }}/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    nvm use {{ node_lts_version }}
-    npm install -g {{ item }}
-  args:
-    executable: /bin/bash
+- name: Install global npm developer tools (macOS)
+  command: "npm install -g {{ item }}"
+  environment:
+    PATH: "/opt/homebrew/bin:/opt/homebrew/opt/node/bin:{{ ansible_env.PATH }}"
   loop:
-    - typescript-language-server
     - typescript
+    - typescript-language-server
     - "@angular/language-server"
     - "@astrojs/language-server"
     - vscode-langservers-extracted
-  ignore_errors: yes
-
-- name: Install global npm packages
-  shell: |
-    export NVM_DIR="{{ ansible_user_dir }}/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    nvm use {{ node_lts_version }}
-    npm install -g {{ item }}
-  args:
-    executable: /bin/bash
-  loop:
     - "@anthropic-ai/claude-code"
     - "@google/gemini-cli"
     - "@mistweaverco/kulala-ls"
@@ -111,6 +116,29 @@
     - pnpm
     - corepack
   ignore_errors: yes
+  when: ansible_os_family == "Darwin"
+
+- name: Install global npm developer tools (Linux)
+  shell: |
+    export NVM_DIR="{{ ansible_user_dir }}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    nvm use {{ node_lts_version }}
+    npm install -g \
+      typescript \
+      typescript-language-server \
+      @angular/language-server \
+      @astrojs/language-server \
+      vscode-langservers-extracted \
+      @anthropic-ai/claude-code \
+      @google/gemini-cli \
+      @mistweaverco/kulala-ls \
+      tree-sitter-cli@{{ tree_sitter_cli_version }} \
+      pnpm \
+      corepack
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+  when: ansible_os_family != "Darwin"
 
 # =============================================================================
 # Rust Installation (via rustup)
@@ -219,12 +247,12 @@
       Programming languages installed successfully!
 
       Go {{ go_version }}:
-        - Installed to /usr/local/go
-        - gopls (language server)
-        - delve (debugger)
+        - gopls
+        - delve
+        - gotestsum
 
-      Node.js {{ node_lts_version }} (via nvm):
-        - nvm installed to ~/.nvm
+      Node.js {{ node_lts_version }}:
+        - typescript
         - typescript-language-server
         - @angular/language-server
         - @astrojs/language-server
@@ -244,11 +272,14 @@
         - lua-language-server
 
       Add to PATH in your shell config:
-        export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
+        export PATH="/opt/homebrew/opt/node/bin:$PATH"
         export PATH="$HOME/.cargo/bin:$PATH"
         export PATH="$HOME/.local/bin:$PATH"
+        export PATH="$HOME/go/bin:$PATH"
 
       Verify installations:
         go version
         node --version
+        gopls version
+        typescript-language-server --version
         cargo --version

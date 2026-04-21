@@ -110,11 +110,8 @@
     - "@astrojs/language-server"
     - vscode-langservers-extracted
     - "@anthropic-ai/claude-code"
-    - "@google/gemini-cli"
     - "@mistweaverco/kulala-ls"
     - "tree-sitter-cli@{{ tree_sitter_cli_version }}"
-    - pnpm
-    - corepack
   ignore_errors: yes
   when: ansible_os_family == "Darwin"
 
@@ -258,11 +255,11 @@
         - @astrojs/language-server
         - vscode-eslint-language-server
         - @anthropic-ai/claude-code
-        - @google/gemini-cli
         - @mistweaverco/kulala-ls
         - tree-sitter-cli@{{ tree_sitter_cli_version }}
-        - pnpm
-        - corepack
+        - @google/gemini-cli (Homebrew on macOS, npm on Linux)
+        - pnpm (Homebrew on macOS, npm on Linux)
+        - corepack (npm on Linux)
 
       Rust {{ rust_version }} (via rustup):
         - rustup installed to ~/.cargo

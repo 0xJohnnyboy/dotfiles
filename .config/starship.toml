@@ -1,7 +1,8 @@
 # Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
-format =  '''
-🧂 $username $directory $git_branch $fill $git_state $git_status $nodejs $lua $docker_context $memory_usage 
+format = '''
+🧂 $username $directory $git_branch $fill $git_state $git_status $nodejs $lua $docker_context $memory_usage
+$character
 '''
 add_newline = true
 

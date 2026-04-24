@@ -20,6 +20,7 @@ if [ "$IS_MAC" = true ]; then
     export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
     export PATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
     export PATH="/opt/homebrew/opt/node/bin:$PATH"
+    export PATH="/Users/johnnyboy/.duckdb/cli/latest":$PATH
 fi
 
 if [ "$IS_LINUX" = true ] || [ "$IS_WSL" = true ]; then

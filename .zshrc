@@ -67,3 +67,5 @@ for local_config in "$ZSH_CONFIG_DIR"/*.local.zsh; do
     [ -f "$local_config" ] && source "$local_config"
 done
 unsetopt nullglob
+
+eval "$(/Users/johnnyboy/.local/bin/mise activate zsh)" # added by https://mise.run/zsh

@@ -22,3 +22,8 @@ fi
 if [ "$IS_MAC" = true ]; then
     [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 fi
+
+# Mise
+if command -v mise &> /dev/null; then
+   eval "$(mise activate zsh)" # added by https://mise.run/zsh
+fi

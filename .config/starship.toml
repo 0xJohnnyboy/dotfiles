@@ -1,13 +1,17 @@
 # Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 format = '''
-🧂 $username $directory $git_branch $fill $git_state $git_status $nodejs $lua $docker_context $memory_usage
+🧂 $directory $git_branch $fill $git_state $git_status $nodejs $lua $docker_context $memory_usage
 $character
 '''
 add_newline = true
 
 [fill]
 symbol = ' '
+
+[character]
+success_symbol = '[→](bold blue) '
+error_symbol = '[✗](bold red) '
 
 [username]
 style_user = 'blue bold'
@@ -49,3 +53,6 @@ format = '[ $symbol($version )]($style)'
 
 [lua]
 format = '[ $symbol($version )]($style)'
+
+[golang]
+format = 'via [$symbol($version )($mod_version )]($style)'

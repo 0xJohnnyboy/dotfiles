@@ -11,6 +11,16 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end,
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'fern',
+    callback = function()
+        vim.b.completion = false
+        pcall(function()
+            require('blink.cmp.completion.windows.ghost_text').clear_preview()
+        end)
+    end,
+})
+
 -- Fern
 vim.g['fern#renderer'] = 'nerdfont'
 

@@ -2,6 +2,9 @@ return {
     "saghen/blink.cmp",
     version = "*",
     opts = {
+        enabled = function()
+            return vim.bo.filetype ~= "fern"
+        end,
         keymap = {
             preset = "default",
             ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
@@ -14,7 +17,20 @@ return {
         },
         completion = {
             documentation = { auto_show = true },
-            ghost_text = { enabled = true },
+            ghost_text = {
+                enabled = function()
+                    return vim.bo.filetype ~= "fern"
+                end,
+            },
+        },
+        cmdline = {
+            completion = {
+                ghost_text = {
+                    enabled = function()
+                        return vim.bo.filetype ~= "fern"
+                    end,
+                },
+            },
         },
         signature = { enabled = true },
         sources = {

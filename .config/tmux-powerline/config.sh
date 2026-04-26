@@ -10,6 +10,9 @@ export TMUX_POWERLINE_THEME="custom"
 # Path to custom themes directory
 export TMUX_POWERLINE_DIR_USER_THEMES="${HOME}/.config/tmux-powerline/themes"
 
+# Path to custom segments directory
+export TMUX_POWERLINE_DIR_USER_SEGMENTS="${HOME}/.config/tmux-powerline/segments"
+
 # Refresh interval
 export TMUX_POWERLINE_STATUS_INTERVAL="2"
 

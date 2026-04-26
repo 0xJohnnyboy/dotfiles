@@ -31,8 +31,12 @@ vim.lsp.enable({
     'astro',
     'eslint',
     'gopls',
+    'cssls',
+    'html',
+    'jsonls',
     'lua_ls',
     'svelte',
+    'tailwindcss',
     'ts_ls',
 })
 

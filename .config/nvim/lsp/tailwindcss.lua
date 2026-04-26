@@ -1,0 +1,25 @@
+return {
+    cmd = { vim.fn.expand('~/.local/bin/tailwindcss-language-server'), '--stdio' },
+    filetypes = {
+        'astro',
+        'css',
+        'html',
+        'javascript',
+        'javascriptreact',
+        'scss',
+        'svelte',
+        'typescript',
+        'typescriptreact',
+        'vue',
+    },
+    root_markers = {
+        'tailwind.config.js',
+        'tailwind.config.cjs',
+        'tailwind.config.mjs',
+        'tailwind.config.ts',
+        'postcss.config.js',
+        'postcss.config.cjs',
+        'package.json',
+        '.git',
+    },
+}

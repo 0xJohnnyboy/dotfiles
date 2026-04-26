@@ -10,6 +10,8 @@ return {
         "nvim-lua/plenary.nvim",
         "antoinemadec/FixCursorHold.nvim",
         "nvim-treesitter/nvim-treesitter",
+        "marilari88/neotest-vitest",
+        "nvim-neotest/neotest-jest",
         "mfussenegger/nvim-dap",
         "leoluz/nvim-dap-go",
         {
@@ -40,6 +42,13 @@ return {
                     runner = "gotestsum",
                     go_test_args = { "-v", "-count=1" },
                     dap_go_enabled = true,
+                }),
+                require("neotest-vitest")({
+                    -- Works for most TypeScript projects without hard-coding npm/pnpm/yarn.
+                    vitestCommand = "npx vitest",
+                }),
+                require("neotest-jest")({
+                    jestCommand = "npx jest",
                 }),
             },
         })

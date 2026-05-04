@@ -37,3 +37,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Haskell (ghcup)
 [ -f "$HOME/.ghcup/env" ] && source "$HOME/.ghcup/env"
+#
+# Added by flyctl installer
+export FLYCTL_INSTALL="/home/tlambert/.fly"
+export PATH="$FLYCTL_INSTALL/bin:$PATH"

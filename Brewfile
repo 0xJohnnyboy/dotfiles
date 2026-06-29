@@ -14,8 +14,6 @@ brew "cmake"
 brew "glib"
 brew "libslirp"
 brew "qemu"
-brew "lima"
-brew "colima", args: ["HEAD"]
 brew "conan"
 brew "difftastic"
 brew "dive"

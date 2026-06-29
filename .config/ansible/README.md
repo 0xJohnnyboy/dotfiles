@@ -36,7 +36,7 @@ ansible-playbook playbook.yml
 ### Install Specific Components
 
 ```bash
-# Install only Neovim
+# Install only Neovim (non-macOS; macOS uses Homebrew/Brewfile)
 ansible-playbook playbook.yml --tags neovim
 
 # Install only shell tools
@@ -52,7 +52,7 @@ ansible-playbook playbook.yml --tags "git,neovim,cli"
 |-----|-------------|
 | `prereqs` | Build dependencies and compilers |
 | `git` | Build git from source |
-| `neovim` | Build neovim from source |
+| `neovim` | Build neovim from source (non-macOS) |
 | `shell` | zsh + oh-my-zsh + starship |
 | `tmux` | tmux + TPM + plugins |
 | `terminal` | WezTerm terminal emulator |

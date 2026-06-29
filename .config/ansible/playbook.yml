@@ -43,6 +43,7 @@
 
     - role: neovim
       tags: [neovim, editor]
+      when: ansible_os_family != "Darwin"
 
     - role: shell
       tags: [shell, zsh]
